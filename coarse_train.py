@@ -1,5 +1,5 @@
-import helper.psnr as psnr
-import helper.load_imgs as load_imgs
+from helper import psnr as psnr
+from helper import load_imgs 
 
 def coarse16_train(f_start,f_end,folder):
     images =  load_imgs(folder, f_start, f_end)  
