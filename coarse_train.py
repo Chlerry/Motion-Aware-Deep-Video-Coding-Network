@@ -1,3 +1,18 @@
+# =================================================
+# import math
+# import keras
+
+# import matplotlib.pyplot as plt
+
+# from skimage.measure import compare_ssim as ssim
+# from PIL import Image
+
+# =================================================
+# import os
+# os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
+
+# SEED=42
+# =================================================
 from helper import psnr as psnr
 from helper import load_imgs 
 
@@ -24,7 +39,7 @@ def coarse16_train(f_start,f_end,folder):
                 coarse_train_set.append(block)
     
     coarse_train_set = np.array(coarse_train_set)
-    # (n_block, b*b, 3) -> (n_block, b, b, 3)
+    # (n_block, b*b, 3) -> (n_block, b, b, 3) # Daniel
     coarse_train_set2 = coarse_train_set.reshape(coarse_train_set.shape[0], b, b, 3)
     
     input_coarse = Input(shape = (b, b, 3))
