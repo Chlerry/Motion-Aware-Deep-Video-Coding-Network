@@ -72,7 +72,7 @@ def results(coarse_frames, images, foldername,  test_start, test_end, b):
     return amse, apsnr, assim
     
     
-def coarse16_test(images, b, folder_save):
+def coarse16_test(images, b):
     
     from keras.models import model_from_json
     json_file = open('./models/BlowingBubbles_416x240_50_coarse16.json', 'r')
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     #coarse16_train(train_start,train_end)
 
     images =  load_imgs(folder, test_start,test_end)
-    coarse_frames = coarse16_test(images, b, folder_save)
+    coarse_frames = coarse16_test(images, b)
 
     amse, apsnr, assim = results(coarse_frames, images, folder_save, test_start, test_end, b)
 
