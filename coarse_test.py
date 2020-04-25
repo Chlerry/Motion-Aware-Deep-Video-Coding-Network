@@ -1,22 +1,22 @@
 import cv2
 import math
-import keras
+# import keras
 import numpy as np
-from keras.models import Model
-from keras.layers import Input, Conv2D, Conv2DTranspose
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-import matplotlib.pyplot as plt
+# from keras.models import Model
+# from keras.layers import Input, Conv2D, Conv2DTranspose
+# import os
+# os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
+# import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 # from skimage.measure import compare_ssim as ssim
 from skimage.metrics import structural_similarity as ssim
 from PIL import Image
 
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import EarlyStopping
+# from keras.optimizers import Adam
+# from keras.callbacks import ModelCheckpoint
+# from keras.callbacks import EarlyStopping
 
-SEED=42
+# SEED=42
 
 from helper import psnr as psnr
 from helper import load_imgs 
