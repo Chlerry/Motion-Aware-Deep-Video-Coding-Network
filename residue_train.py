@@ -25,12 +25,8 @@ from keras.callbacks import EarlyStopping
 from helper import psnr, load_imgs
 from coarse_test import coarse16_test
 
-def pred_inference(folder, start, end, b, bm, coarse_frames):
+def pred_inference(N_frames, b, bm, images, coarse_frames):
     
-    N_frames = end - start
-        
-    #coarse_frames = coarse16_pred(folder, start, end)
-    images = load_imgs(folder, start, end)
     width, height = images.shape[1], images.shape[2]
 
     N_blocks = int((width*height)/(b*b))
@@ -324,7 +320,9 @@ if __name__ == "__main__":
     images =  load_imgs(folder, train_start, train_end)
     coarse_frames = coarse16_test(images, b)
     bm = 8 # target block size to predict
-    predicted_frames = pred_inference(folder, train_start, train_end, b, bm, coarse_frames)
+
+    N_frames = train_end - train_start
+    predicted_frames = pred_inference(N_frames, b, bm, images, coarse_frames)
  
     residue_train(folder, train_start, train_end, bm, b, predicted_frames)
     
