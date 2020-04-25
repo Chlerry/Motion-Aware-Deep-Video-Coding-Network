@@ -246,69 +246,6 @@ def residue_train(folder, start, end, bm, b, pred):
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     residue_model.fit(C, C, batch_size=100, epochs=100, verbose=2, validation_split=0.2, callbacks=callbacks_list)
-
-    
-def residue_inference(folder, start, end, pred): # start
-    N_frames = end-start
-
-    images = load_imgs(folder, start+1, end-1)
-    width, height = images.shape[1], images.shape[2]
-    
-    #N_blocks = int((width*height)/(b*b))
-    
-    residue = images - pred
-    print(residue.shape)
-    
-    C = []
-    
-    for i in range(0, N_frames-2): 
-        current = residue[i]
-        for y in range(0, width, b):
-            for x in range(0, height, b):
-                block = current[y:y + b, x:x + b]
-                block = block.reshape(b*b, 3)
-                C.append(block)
-    
-    C = np.array(C)
-    C = C.reshape(C.shape[0], b, b, 3)
-    print(C.shape)
-    
-# load residue16 model
-    from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_residue16.json', 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    residue_model = model_from_json(loaded_model_json)
-    # load weights into new model
-    residue_model.load_weights("./models/BlowingBubbles_416x240_50_residue16.hdf5")
-    print("Loaded model from disk")
-    
-    residue_decoded = residue_model.predict(C)
-    
-    final2 = []
-    N_mblocks = (width*height)/(b*b)
-    f = residue_decoded.reshape(N_frames-2, N_mblocks, b*b, 3)
-    for n in f:
-        result = np.zeros((width, height,3))
-        i = 0
-        for y in range(0, result.shape[0], b):
-            for x in range(0, result.shape[1], b):
-                res = n[i].reshape(b,b,3)
-                result[y:y + b, x:x + b] = res
-                i = i + 1
-        final2.append(result)
-    
-    final2 = np.array(final2)    
-    
-    finalpred = np.add(pred, final2)
-    
-    j = start+1
-    for result in finalpred:
-        filename = 'residue16/'+str(j)+'.png'
-        im_rgb = cv2.cvtColor(result.astype(np.uint8), cv2.COLOR_BGR2RGB)
-        im = Image.fromarray(im_rgb)
-        im.save(filename)
-        j = j + 1
     
 if __name__ == "__main__":   
     folder = './dataset/BlowingBubbles_416x240_50/'
