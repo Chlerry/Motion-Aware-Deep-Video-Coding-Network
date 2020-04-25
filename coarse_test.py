@@ -87,17 +87,6 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     
     # evaluate loaded model on test data
     coarse_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
-    
-    # coarse_set = []
-    # for img in images:
-    #     for y in range(0, img.shape[0], b):
-    #         for x in range(0, img.shape[1], b):
-    #             block = img[y:y + b, x:x + b]
-    #             block = block.reshape(b*b, 3)
-    #             coarse_set.append(block)
-    
-    # coarse_set = np.array(coarse_set)
-    # coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
 
     coarse_set = get_coarse_set(images, b)
     
