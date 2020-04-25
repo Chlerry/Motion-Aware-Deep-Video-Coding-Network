@@ -13,9 +13,6 @@
 
 # SEED=42
 # =================================================
-from helper import psnr
-from helper import load_imgs 
-
 import numpy as np
 from keras.layers import * # YL
 from keras.models import Model
@@ -24,21 +21,12 @@ from keras.models import Model
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
+from helper import psnr, load_imgs, get_coarse_set
+
 def coarse16_train(f_start,f_end,folder):
     images =  load_imgs(folder, f_start, f_end)  
 
-    coarse_train_set = []
-    for img in images:
-        #b: blk_size
-        for y in range(0, img.shape[0], b):
-            for x in range(0, img.shape[1], b):
-                block = img[y:y + b, x:x + b]
-                block = block.reshape(b*b, 3)
-                coarse_train_set.append(block)
-    
-    coarse_train_set = np.array(coarse_train_set)
-    # (n_block, b*b, 3) -> (n_block, b, b, 3) # Daniel
-    coarse_train_set2 = coarse_train_set.reshape(coarse_train_set.shape[0], b, b, 3)
+    coarse_train_set = get_coarse_set(images, b)
     
     input_coarse = Input(shape = (b, b, 3))
     
@@ -79,7 +67,7 @@ def coarse16_train(f_start,f_end,folder):
     checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_coarse16.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
-    coarse_model.fit(coarse_train_set2, coarse_train_set2, batch_size=10, epochs=1, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+    coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=10, epochs=1, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     # ===================================================
 
 if __name__ == "__main__":   
