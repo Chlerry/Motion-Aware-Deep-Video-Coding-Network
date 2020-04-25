@@ -23,59 +23,8 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 
-def psnr(img_true, img_recovered):    
-    pixel_max = 255.0
-    mse = np.mean((img_true-img_recovered)**2)
-    p = 20 * math.log10( pixel_max / math.sqrt( mse ))
-    return p
-
-
-def load_imgs(path, start, end):
-    train_set = []
-    for n in range(start, end):
-        fname = path  + str(n) + ".png"
-        img = cv2.imread(fname, 1)
-        if img is not None:
-                train_set.append(img)
-    train_set = np.array(train_set)
-    return train_set
-
-def coarse16_inference(folder, start, end):
-    images =  load_imgs(folder, start, end)
-    
-    print(images.shape)
-    
-    #images =  load_imgs(folder, test_start,test_end)
-    
-    
-    from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_coarse16.json', 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    coarse_model = model_from_json(loaded_model_json)
-    # load weights into new model
-    coarse_model.load_weights("./models/BlowingBubbles_416x240_50_coarse16.hdf5")
-    print("Loaded model from disk")
-    
-    # evaluate loaded model on test data
-    coarse_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
-    
-    
-    coarse_set = []
-    for img in images:
-        block = []
-        for y in range(0, img.shape[0], b):
-            for x in range(0, img.shape[1], b):
-                block = img[y:y + b, x:x + b]
-                block = block.reshape(b*b, 3)
-                coarse_set.append(block)
-    
-    coarse_set = np.array(coarse_set)
-    coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
-    
-    coarse_frames = coarse_model.predict(coarse_set2)
-
-    return coarse_frames
+from helper import psnr, load_imgs
+from coarse_test import coarse16_test
 
 def pred_inference(folder, start, end, b, bm, coarse_frames):
     
@@ -199,9 +148,7 @@ if __name__ == "__main__":
     b = 16 # blk_size & ref. blk size
     test_start, test_end = 100, 120
     
-    coarse_frames = coarse16_inference(folder, test_start, test_end)
+    images = load_imgs(folder, test_start, test_end)
+    coarse_frames = coarse16_test(images, b)
     bm = 8 # target block size to predict
     predicted_frames = pred_inference(folder, test_start, test_end, b, bm, coarse_frames)
-    
-
-
