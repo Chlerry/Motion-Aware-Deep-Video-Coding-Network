@@ -26,9 +26,9 @@ from helper import psnr, load_imgs
 from coarse_test import coarse16_test
 from prediction_inference import pred_inference
 
-def regroup(N_frames, bm, predicted_frames):
+def regroup(N_frames, images_shape, bm, predicted_frames):
     
-    width, height = images.shape[1], images.shape[2]
+    width, height = images_shape[1], images_shape[2]
     
     final_prediction=[]
     
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
     N_frames = train_end - train_start
     predicted_frames = pred_inference(N_frames, b, bm, images, coarse_frames)
-    final_prediction = regroup(N_frames, bm, predicted_frames)
+    final_prediction = regroup(N_frames, images.shape, bm, predicted_frames)
  
     residue_train(folder, train_start, train_end, bm, b, final_prediction)
     
