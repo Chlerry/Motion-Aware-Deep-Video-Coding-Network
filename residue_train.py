@@ -47,40 +47,6 @@ def regroup(N_frames, bm, predicted_frames):
     final_prediction = np.array(final_prediction) # re-group the decoded frames
         
     return final_prediction
-    # ===================================================
-
-def performance_evaluation(folder,start,end,finalpred):
-    images =  load_imgs(folder, start+1, end-1)
-    N_frames = end-start
-    width, height = images.shape[1], images.shape[2]
-    pixel_max = 255.0
-    mse = []
-    psnr = []
-    ssims = []
-    
-   
-    for i in range(0,N_frames-2):
-        img = images[i].reshape(width*height, 3)
-        res = finalpred[i].reshape(width*height, 3)
-        m = mean_squared_error(img, res)
-        s = ssim(img, res, multichannel=True)
-        p = 20 * math.log10( pixel_max / math.sqrt( m ))
-        psnr.append(p)
-        mse.append(m)
-        ssims.append(s)
-    
-    j = start+1
-    for result in finalpred:
-        filename = 'prediction16result/'+str(j)+'.png'
-        im_rgb = cv2.cvtColor(result.astype(np.uint8), cv2.COLOR_BGR2RGB)
-        im = Image.fromarray(im_rgb)
-        im.save(filename)
-        j = j + 1
-    
-    amse = np.mean(mse)
-    apsnr = np.mean(psnr)
-    assim = np.mean(ssims)
-    return amse, apsnr, assim
       
 def residue_train(folder, start, end, bm, b, pred):
     N_frames = end-start # including the ref. frames
