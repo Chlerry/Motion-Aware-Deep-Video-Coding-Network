@@ -72,9 +72,7 @@ def results(coarse_frames, images, foldername,  test_start, test_end, b):
     return amse, apsnr, assim
     
     
-def coarse16_test(test_start,test_end,folder, b, folder_save):
-    
-    images =  load_imgs(folder, test_start,test_end)
+def coarse16_test(images, b, folder_save):
     
     from keras.models import model_from_json
     json_file = open('./models/BlowingBubbles_416x240_50_coarse16.json', 'r')
@@ -93,8 +91,8 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     coarse_frames = coarse_model.predict(coarse_set)
 
     #foldername = '/home/yingliu/Desktop/Rida/Code/BlowingBubbles_416x240_50_coarse16result/'
-    amse, apsnr, assim = results(coarse_frames, images, folder_save, test_start, test_end, b)
-    return amse, apsnr, assim
+    
+    return coarse_frames
 
 if __name__ == "__main__":   
     folder = './dataset/BasketballDrill_832x480_50/'
@@ -104,7 +102,12 @@ if __name__ == "__main__":
     b = 16 # blk_size
     test_start, test_end = 0, 100
     #coarse16_train(train_start,train_end)
-    amse, apsnr, assim = coarse16_test(test_start,test_end,folder, b, folder_save)
+
+    images =  load_imgs(folder, test_start,test_end)
+    coarse_frames = coarse16_test(images, b, folder_save)
+
+    amse, apsnr, assim = results(coarse_frames, images, folder_save, test_start, test_end, b)
+
     print('average test mse:',amse)
     print('average test psnr:',apsnr)
     print('average test ssim:',assim)
