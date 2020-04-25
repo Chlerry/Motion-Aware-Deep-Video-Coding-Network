@@ -13,7 +13,7 @@
 
 # SEED=42
 # =================================================
-from helper import psnr as psnr
+from helper import psnr
 from helper import load_imgs 
 
 import numpy as np

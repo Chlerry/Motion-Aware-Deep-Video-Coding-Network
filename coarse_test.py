@@ -22,7 +22,7 @@ from sklearn.metrics import mean_squared_error
 from skimage.metrics import structural_similarity as ssim
 from PIL import Image
 
-from helper import psnr as psnr
+from helper import psnr
 from helper import load_imgs 
 
 def results(coarse_frames, images, foldername,  test_start, test_end, b):
