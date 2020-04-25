@@ -279,7 +279,7 @@ def residue_inference(folder, start, end, pred): # start
     
 # load residue16 model
     from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_residue.16json', 'r')
+    json_file = open('./models/BlowingBubbles_416x240_50_residue16.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     residue_model = model_from_json(loaded_model_json)
