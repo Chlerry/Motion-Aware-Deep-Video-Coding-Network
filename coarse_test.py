@@ -135,3 +135,4 @@ if __name__ == "__main__":
     print('average test mse:',amse)
     print('average test psnr:',apsnr)
     print('average test ssim:',assim)
+    
