@@ -16,3 +16,19 @@ def load_imgs(path, start, end):
                 train_set.append(img)
     train_set = np.array(train_set)
     return train_set
+
+def get_coarse_set(images, b):
+    coarse_set = []
+    for img in images:
+        #b: blk_size
+        for y in range(0, img.shape[0], b):
+            for x in range(0, img.shape[1], b):
+                block = img[y:y + b, x:x + b]
+                block = block.reshape(b*b, 3)
+                coarse_set.append(block)
+    
+    coarse_set = np.array(coarse_set)
+    # (n_block, b*b, 3) -> (n_block, b, b, 3) # Daniel
+    coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
+
+    return coarse_set2

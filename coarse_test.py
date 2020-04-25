@@ -29,8 +29,7 @@ from sklearn.metrics import mean_squared_error
 from skimage.metrics import structural_similarity as ssim
 from PIL import Image
 
-from helper import psnr
-from helper import load_imgs 
+from helper import psnr, load_imgs, get_coarse_set
 
 def results(coarse_frames, images, foldername,  test_start, test_end, b):
     
@@ -96,18 +95,20 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     # evaluate loaded model on test data
     coarse_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
     
-    coarse_set = []
-    for img in images:
-        for y in range(0, img.shape[0], b):
-            for x in range(0, img.shape[1], b):
-                block = img[y:y + b, x:x + b]
-                block = block.reshape(b*b, 3)
-                coarse_set.append(block)
+    # coarse_set = []
+    # for img in images:
+    #     for y in range(0, img.shape[0], b):
+    #         for x in range(0, img.shape[1], b):
+    #             block = img[y:y + b, x:x + b]
+    #             block = block.reshape(b*b, 3)
+    #             coarse_set.append(block)
     
-    coarse_set = np.array(coarse_set)
-    coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
+    # coarse_set = np.array(coarse_set)
+    # coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
+
+    coarse_set = get_coarse_set(images, b)
     
-    coarse_frames = coarse_model.predict(coarse_set2)
+    coarse_frames = coarse_model.predict(coarse_set)
 
     #foldername = '/home/yingliu/Desktop/Rida/Code/BlowingBubbles_416x240_50_coarse16result/'
     amse, apsnr, assim = results(coarse_frames, images, folder_save, test_start, test_end, b)
