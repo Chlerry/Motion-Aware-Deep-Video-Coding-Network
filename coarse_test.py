@@ -90,8 +90,7 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     coarse_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
     
     coarse_set = []
-    for i in range(0, images.shape[0]): 
-        img = images[i]
+    for img in images:
         for y in range(0, img.shape[0], b):
             for x in range(0, img.shape[1], b):
                 block = img[y:y + b, x:x + b]
