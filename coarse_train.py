@@ -13,7 +13,7 @@
 
 # SEED=42
 # =================================================
-from helper import psnr as psnr
+from helper import psnr
 from helper import load_imgs 
 
 import numpy as np
@@ -29,8 +29,6 @@ def coarse16_train(f_start,f_end,folder):
 
     coarse_train_set = []
     for img in images:
-        block = []
-
         #b: blk_size
         for y in range(0, img.shape[0], b):
             for x in range(0, img.shape[1], b):
