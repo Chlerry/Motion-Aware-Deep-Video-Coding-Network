@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import cv2
 import math
@@ -30,6 +31,44 @@ from skimage.metrics import structural_similarity as ssim
 from PIL import Image
 
 from helper import psnr, load_imgs, get_coarse_set
+=======
+import cv2
+import math
+import keras
+import numpy as np
+from keras.models import Model
+from keras.layers import Input, Conv2D, Conv2DTranspose
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+# from skimage.measure import compare_ssim as ssim
+from skimage.metrics import structural_similarity as ssim
+from PIL import Image
+
+from keras.optimizers import Adam
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import EarlyStopping
+
+SEED=42
+
+def psnr(img_true, img_recovered):    
+    pixel_max = 255.0
+    mse = np.mean((img_true-img_recovered)**2)
+    p = 20 * math.log10( pixel_max / math.sqrt( mse ))
+    return p
+
+
+def load_imgs(path, start, end):
+    train_set = []
+    for n in range(start, end):
+        fname = path +  str(n) + ".png"
+        img = cv2.imread(fname, 1)
+        if img is not None:
+                train_set.append(img)
+    train_set = np.array(train_set)
+    return train_set
+>>>>>>> d914a70... Add original code by Rida Khan and Ying Liu
 
 def results(coarse_frames, images, foldername,  test_start, test_end, b):
     
@@ -95,6 +134,7 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     # evaluate loaded model on test data
     coarse_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
     
+<<<<<<< HEAD
     # coarse_set = []
     # for img in images:
     #     for y in range(0, img.shape[0], b):
@@ -109,6 +149,21 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     coarse_set = get_coarse_set(images, b)
     
     coarse_frames = coarse_model.predict(coarse_set)
+=======
+    coarse_set = []
+    for i in range(0, images.shape[0]): 
+        img = images[i]
+        for y in range(0, img.shape[0], b):
+            for x in range(0, img.shape[1], b):
+                block = img[y:y + b, x:x + b]
+                block = block.reshape(b*b, 3)
+                coarse_set.append(block)
+    
+    coarse_set = np.array(coarse_set)
+    coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
+    
+    coarse_frames = coarse_model.predict(coarse_set2)
+>>>>>>> d914a70... Add original code by Rida Khan and Ying Liu
 
     #foldername = '/home/yingliu/Desktop/Rida/Code/BlowingBubbles_416x240_50_coarse16result/'
     amse, apsnr, assim = results(coarse_frames, images, folder_save, test_start, test_end, b)
@@ -132,4 +187,7 @@ if __name__ == "__main__":
 
 
 
+<<<<<<< HEAD
 >>>>>>> 5a942be... Replace psnr and load_imgs method with existing module
+=======
+>>>>>>> d914a70... Add original code by Rida Khan and Ying Liu
