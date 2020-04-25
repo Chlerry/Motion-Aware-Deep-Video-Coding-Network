@@ -22,25 +22,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
-
-
-
-def psnr(img_true, img_recovered):    
-    pixel_max = 255.0
-    mse = np.mean((img_true-img_recovered)**2)
-    p = 20 * math.log10( pixel_max / math.sqrt( mse ))
-    return p
-
-
-def load_imgs(path, start, end):
-    train_set = []
-    for n in range(start, end):
-        fname = path  + str(n) + ".png"
-        img = cv2.imread(fname, 1)
-        if img is not None:
-                train_set.append(img)
-    train_set = np.array(train_set)
-    return train_set
+from helper import psnr, load_imgs
 
 def coarse16_inference(folder, start, end):
     images =  load_imgs(folder, start, end)
@@ -48,8 +30,6 @@ def coarse16_inference(folder, start, end):
     print(images.shape)
     
     #images =  load_imgs(folder, test_start,test_end)
-
-    
     
     from keras.models import model_from_json
     json_file = open('./models/BlowingBubbles_416x240_50_coarse16.json', 'r')
@@ -62,8 +42,7 @@ def coarse16_inference(folder, start, end):
     
     # evaluate loaded model on test data
     coarse_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
-    
-    
+       
     coarse_set = []
     for img in images:
         block = []
@@ -79,12 +58,6 @@ def coarse16_inference(folder, start, end):
     coarse_frames = coarse_model.predict(coarse_set2)
 
     return coarse_frames
-
-
-
-
-
-
 
 def pred_inference(folder, start, end, b, bm, coarse_frames):
     
@@ -135,7 +108,6 @@ def pred_inference(folder, start, end, b, bm, coarse_frames):
                     block = img[y:y + b, x:x + b]
                     block = block.reshape(b*b, 3)
                     prev.append(block)
-    
                 
     prev = np.array(prev)
     prev = prev.reshape(prev.shape[0], b, b, 3)
@@ -183,8 +155,6 @@ def pred_inference(folder, start, end, b, bm, coarse_frames):
     C = np.array(C)
     C = C.reshape(C.shape[0], bm, bm, 3)
     print(C.shape)
-    
-
     
     # ============== YL: load model ===============================
     
@@ -241,8 +211,6 @@ def performance_evaluation(folder,start,end,finalpred):
         psnr.append(p)
         mse.append(m)
         ssims.append(s)
-       
-        
     
     j = start+1
     for result in finalpred:
@@ -256,8 +224,6 @@ def performance_evaluation(folder,start,end,finalpred):
     apsnr = np.mean(psnr)
     assim = np.mean(ssims)
     return amse, apsnr, assim
-  
-
       
 def residue_train(folder, start, end, bm, b, pred):
     N_frames = end-start # including the ref. frames
@@ -328,8 +294,6 @@ def residue_inference(folder, start, end, pred): # start
     
     #N_blocks = int((width*height)/(b*b))
     
-
-    
     residue = images - pred
     print(residue.shape)
     
@@ -383,12 +347,6 @@ def residue_inference(folder, start, end, pred): # start
         im = Image.fromarray(im_rgb)
         im.save(filename)
         j = j + 1
-  
-    
- 
-    
-    
-
     
 if __name__ == "__main__":   
     folder = './dataset/BlowingBubbles_416x240_50/'
@@ -402,6 +360,3 @@ if __name__ == "__main__":
  
     residue_train(folder, train_start, train_end, bm, b, predicted_frames)
     
-    
-
-
