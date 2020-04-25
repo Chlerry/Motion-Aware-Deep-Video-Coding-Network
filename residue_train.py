@@ -159,12 +159,12 @@ def pred_inference(folder, start, end, b, bm, coarse_frames):
     # ============== YL: load model ===============================
     
     from keras.models import model_from_json
-    json_file = open('./models_new/BlowingBubbles_416x240_50_pred16.json', 'r')
+    json_file = open('./models/BlowingBubbles_416x240_50_pred16.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     pred_model = model_from_json(loaded_model_json)
     # load weights into new model
-    pred_model.load_weights("./models_new/BlowingBubbles_416x240_50_pred16.hdf5")
+    pred_model.load_weights("./models/BlowingBubbles_416x240_50_pred16.hdf5")
     print("Loaded model from disk")
     
     # evaluate loaded model on test data
@@ -271,7 +271,7 @@ def residue_train(folder, start, end, bm, b, pred):
     # save model
    
     model_json = residue_model.to_json()
-    with open("./models_new/BlowingBubbles_416x240_50_residue16.json", "w") as json_file:
+    with open("./models/BlowingBubbles_416x240_50_residue16.json", "w") as json_file:
         json_file.write(model_json)
 
     
@@ -280,7 +280,7 @@ def residue_train(folder, start, end, bm, b, pred):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='C:./models_new/BlowingBubbles_416x240_50_residue16.hdf5',\
+    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_residue16.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     residue_model.fit(C, C, batch_size=100, epochs=100, verbose=2, validation_split=0.2, callbacks=callbacks_list)
@@ -313,12 +313,12 @@ def residue_inference(folder, start, end, pred): # start
     
 # load residue16 model
     from keras.models import model_from_json
-    json_file = open('./models_new/BlowingBubbles_416x240_50_residue.16json', 'r')
+    json_file = open('./models/BlowingBubbles_416x240_50_residue.16json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     residue_model = model_from_json(loaded_model_json)
     # load weights into new model
-    residue_model.load_weights("./models_new/BlowingBubbles_416x240_50_residue16.hdf5")
+    residue_model.load_weights("./models/BlowingBubbles_416x240_50_residue16.hdf5")
     print("Loaded model from disk")
     
     residue_decoded = residue_model.predict(C)
