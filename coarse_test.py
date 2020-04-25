@@ -1,37 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import cv2
-import math
-=======
-# =================================================
->>>>>>> 91226fc... Re-format comments
-# import keras
-# from keras.models import Model
-# from keras.layers import Input, Conv2D, Conv2DTranspose
-# import os
-# os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-# import matplotlib.pyplot as plt
-
-# from keras.optimizers import Adam
-# from keras.callbacks import ModelCheckpoint
-# from keras.callbacks import EarlyStopping
-
-# from skimage.measure import compare_ssim as ssim
-
-# SEED=42
-# =================================================
-import cv2
-import math
-import numpy as np
-
-from sklearn.metrics import mean_squared_error
-from skimage.metrics import structural_similarity as ssim
-from PIL import Image
-
-from helper import psnr, load_imgs, get_coarse_set
-=======
 import cv2
 import math
 import keras
@@ -68,7 +34,6 @@ def load_imgs(path, start, end):
                 train_set.append(img)
     train_set = np.array(train_set)
     return train_set
->>>>>>> d914a70... Add original code by Rida Khan and Ying Liu
 
 def results(coarse_frames, images, foldername,  test_start, test_end, b):
     
@@ -118,9 +83,7 @@ def results(coarse_frames, images, foldername,  test_start, test_end, b):
     return amse, apsnr, assim
     
     
-def coarse16_test(test_start,test_end,folder, b, folder_save):
-    
-    images =  load_imgs(folder, test_start,test_end)
+def coarse16_test(images, b):
     
     from keras.models import model_from_json
     json_file = open('./models/BlowingBubbles_416x240_50_coarse16.json', 'r')
@@ -133,23 +96,10 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     
     # evaluate loaded model on test data
     coarse_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
-    
-<<<<<<< HEAD
-    # coarse_set = []
-    # for img in images:
-    #     for y in range(0, img.shape[0], b):
-    #         for x in range(0, img.shape[1], b):
-    #             block = img[y:y + b, x:x + b]
-    #             block = block.reshape(b*b, 3)
-    #             coarse_set.append(block)
-    
-    # coarse_set = np.array(coarse_set)
-    # coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
 
     coarse_set = get_coarse_set(images, b)
     
     coarse_frames = coarse_model.predict(coarse_set)
-=======
     coarse_set = []
     for i in range(0, images.shape[0]): 
         img = images[i]
@@ -163,11 +113,10 @@ def coarse16_test(test_start,test_end,folder, b, folder_save):
     coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
     
     coarse_frames = coarse_model.predict(coarse_set2)
->>>>>>> d914a70... Add original code by Rida Khan and Ying Liu
 
     #foldername = '/home/yingliu/Desktop/Rida/Code/BlowingBubbles_416x240_50_coarse16result/'
-    amse, apsnr, assim = results(coarse_frames, images, folder_save, test_start, test_end, b)
-    return amse, apsnr, assim
+    
+    return coarse_frames
 
 if __name__ == "__main__":   
     folder = './dataset/BasketballDrill_832x480_50/'
@@ -177,17 +126,12 @@ if __name__ == "__main__":
     b = 16 # blk_size
     test_start, test_end = 0, 100
     #coarse16_train(train_start,train_end)
-    amse, apsnr, assim = coarse16_test(test_start,test_end,folder, b, folder_save)
+
+    images =  load_imgs(folder, test_start,test_end)
+    coarse_frames = coarse16_test(images, b)
+
+    amse, apsnr, assim = results(coarse_frames, images, folder_save, test_start, test_end, b)
+
     print('average test mse:',amse)
     print('average test psnr:',apsnr)
     print('average test ssim:',assim)
-    
-
-
-
-
-
-<<<<<<< HEAD
->>>>>>> 5a942be... Replace psnr and load_imgs method with existing module
-=======
->>>>>>> d914a70... Add original code by Rida Khan and Ying Liu
