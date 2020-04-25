@@ -321,7 +321,7 @@ if __name__ == "__main__":
     test_start, test_end = 100, 200
     train_start, train_end = 0, 20
 
-    images =  load_imgs(train_start, train_end, end)
+    images =  load_imgs(folder, train_start, train_end)
     coarse_frames = coarse16_test(images, b)
     bm = 8 # target block size to predict
     predicted_frames = pred_inference(folder, train_start, train_end, b, bm, coarse_frames)
