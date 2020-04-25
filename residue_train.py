@@ -24,121 +24,16 @@ from keras.callbacks import EarlyStopping
 
 from helper import psnr, load_imgs
 from coarse_test import coarse16_test
+from prediction_inference import pred_inference
 
-def pred_inference(N_frames, b, bm, images, coarse_frames):
+def regroup(N_frames, bm, predicted_frames):
     
     width, height = images.shape[1], images.shape[2]
-
-    N_blocks = int((width*height)/(b*b))
     
-    decoded = []
-    f = coarse_frames.reshape(N_frames, N_blocks, b*b, 3)
-    for n in f:
-        result = np.zeros((width, height, 3))
-        i = 0
-        for y in range(0, result.shape[0], b):
-           for x in range(0, result.shape[1], b):
-               res = n[i].reshape(b,b, 3)
-               result[y:y + b, x:x + b] = res
-               i = i + 1
-              
-        decoded.append(result)
-    
-    decoded = np.array(decoded) # re-group the decoded frames
-    
-    prev = []
-    
-    for i in range(0, N_frames-2): # take the reference frames
-        img = decoded[i] # frame the decoded frames
-        
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
-                block = np.zeros((b, b, 3))
-                if (y + b) >= img.shape[0] and (x + b) < img.shape[1] :
-                    block = img[y-bm:y-bm+b, x:x+b]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)
-                elif (x + b) >= img.shape[1] and (y + b) < img.shape[0]:
-                    block = img[y:y+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    prev.append(block)
-                elif (y + b) >= img.shape[0] and (x + b) >= img.shape[1] :
-                    block = img[y-bm:y-bm+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    prev.append(block)
-                else:
-                    block = img[y:y + b, x:x + b]
-                    block = block.reshape(b*b, 3)
-                    prev.append(block)
-                
-    prev = np.array(prev)
-    prev = prev.reshape(prev.shape[0], b, b, 3)
-    print(prev.shape)
-    
-    B = []
-    
-    for i in range(0, N_frames-2): 
-        next_f = decoded[i+2]
-        
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
-                if (y + b) >= img.shape[0] and (x + b) < img.shape[1] :
-                    block = next_f[y-bm:y-bm+b, x:x+b]
-                    block = block.reshape(b*b,3)
-                    B.append(block)
-                elif (x + b) >= img.shape[1] and (y + b) < img.shape[0]:
-                    block = next_f[y:y+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    B.append(block)
-                elif (y + b) >= img.shape[0] and (x + b) >= img.shape[1] :
-                    block = next_f[y-bm:y-bm+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    B.append(block)
-                else:
-                    block = next_f[y:y + b, x:x + b]
-                    block = block.reshape(b*b, 3)
-                    B.append(block)
-    
-                
-    B = np.array(B)
-    B = B.reshape(B.shape[0], b, b, 3)
-    print(B.shape)
-    
-    C = []
-    
-    for i in range(0, N_frames-2): 
-        current = images[i+1]
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
-                block = current[y:y + bm, x:x + bm]
-                block = block.reshape(bm*bm, 3)
-                C.append(block)
-    
-    C = np.array(C)
-    C = C.reshape(C.shape[0], bm, bm, 3)
-    print(C.shape)
-    
-    # ============== YL: load model ===============================
-    
-    from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_pred16.json', 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    pred_model = model_from_json(loaded_model_json)
-    # load weights into new model
-    pred_model.load_weights("./models/BlowingBubbles_416x240_50_pred16.hdf5")
-    print("Loaded model from disk")
-    
-    # evaluate loaded model on test data
-    pred_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
-
-    predicted_frames = pred_model.predict([prev, B])
-    #final_prediction = np.zeros((N_frames-2,width,height,3))
     final_prediction=[]
     
-    #f = coarse_frames.reshape(N_frames, N_blocks, b*b, 3)
-    i=0
-    for n in range(N_frames-2):
+    i = 0
+    for n in range(N_frames - 2):
         result = np.zeros((width, height, 3))
         
         for y in range(0, width, bm):
@@ -260,6 +155,7 @@ if __name__ == "__main__":
 
     N_frames = train_end - train_start
     predicted_frames = pred_inference(N_frames, b, bm, images, coarse_frames)
+    final_prediction = regroup(N_frames, bm, predicted_frames)
  
-    residue_train(folder, train_start, train_end, bm, b, predicted_frames)
+    residue_train(folder, train_start, train_end, bm, b, final_prediction)
     
