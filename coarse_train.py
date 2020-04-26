@@ -27,7 +27,10 @@ from helper import psnr, load_imgs, get_coarse_set
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
+
 import tensorflow as tf
+
+# ---- Method 1 ----
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -35,6 +38,14 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
+
+# ---- Method 2 ----
+# gpus = tf.config.experimental.list_physical_devices('GPU')
+# if gpus:
+#     try:
+#         tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
+#     except RuntimeError as e:
+#         print(e)
 # ============== DL ===============================
 
 def coarse16_train(f_start,f_end,folder):
@@ -81,7 +92,7 @@ def coarse16_train(f_start,f_end,folder):
     checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_coarse16.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
-    coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=10, epochs=1, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+    coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=10, epochs=10, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     # ===================================================
 
 if __name__ == "__main__":   
