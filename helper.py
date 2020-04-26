@@ -36,7 +36,7 @@ def get_coarse_set(images, b):
 def get_block_set(N_frames, decoded, b, bm, skip): 
     block_set = []
 
-    for i in range(0, N_frames-2): 
+    for i in range(0, N_frames): 
         img = decoded[i + skip]
 
         for y in range(0, img.shape[0], bm):
