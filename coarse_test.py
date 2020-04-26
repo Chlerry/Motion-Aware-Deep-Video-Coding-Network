@@ -35,6 +35,20 @@ def load_imgs(path, start, end):
     train_set = np.array(train_set)
     return train_set
 
+# ============== DL ===============================
+# Limit GPU memory(VRAM) usage in TensorFlow 2.0
+# https://github.com/tensorflow/tensorflow/issues/34355
+# https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
+import tensorflow as tf
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
+# =================================================
+
 def results(coarse_frames, images, foldername,  test_start, test_end, b):
     
     print("RESULTS")
