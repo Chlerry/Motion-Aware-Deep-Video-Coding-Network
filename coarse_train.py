@@ -23,6 +23,20 @@ from keras.callbacks import EarlyStopping
 
 from helper import psnr, load_imgs, get_coarse_set
 
+# ============== DL ===============================
+# Limit GPU memory(VRAM) usage in TensorFlow 2.0
+# https://github.com/tensorflow/tensorflow/issues/34355
+# https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
+import tensorflow as tf
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
+# ============== DL ===============================
+
 def coarse16_train(f_start,f_end,folder):
     images =  load_imgs(folder, f_start, f_end)  
 
