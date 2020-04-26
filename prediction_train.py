@@ -65,12 +65,14 @@ def pred_train(folder, start, end, b, bm):
     
     decoded = np.array(decoded) # re-group the decoded frames
     
+    # ============== DL ===============================
     prev = get_block_set(N_frames, decoded, b, bm, 0)
     print(prev.shape)
     
     B = get_block_set(N_frames, decoded, b, bm, 2)
     print(B.shape)
-    
+    # =================================================
+
     C = []
     
     for i in range(0, N_frames-2): 
@@ -119,7 +121,7 @@ def pred_train(folder, start, end, b, bm):
     #pred_model.save_weights('pred_NM_w5.h5')
     # ============== YL ===============================
     # save model and load model
-   # from keras.models import model_from_json
+    # from keras.models import model_from_json
     # serialize model to JSON
     model_json = pred_model.to_json()
     with open("./models/BlowingBubbles_416x240_50_pred16_0411.json", "w") as json_file:
