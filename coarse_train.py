@@ -46,7 +46,7 @@ if gpus:
 #         tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
 #     except RuntimeError as e:
 #         print(e)
-# ============== DL ===============================
+# =================================================
 
 def coarse16_train(f_start,f_end,folder):
     images =  load_imgs(folder, f_start, f_end)  

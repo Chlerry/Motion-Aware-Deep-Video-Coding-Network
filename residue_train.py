@@ -38,7 +38,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 
 def regroup(N_frames, images_shape, bm, predicted_frames):
     

@@ -36,7 +36,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 
 def results(coarse_frames, images, foldername,  test_start, test_end, b):
     

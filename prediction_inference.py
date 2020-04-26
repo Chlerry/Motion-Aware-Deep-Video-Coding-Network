@@ -38,7 +38,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 
 def pred_inference(N_frames, b, bm, images, coarse_frames):
         
