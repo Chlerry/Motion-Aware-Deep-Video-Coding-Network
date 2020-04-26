@@ -66,10 +66,10 @@ def pred_train(folder, start, end, b, bm):
     decoded = np.array(decoded) # re-group the decoded frames
     
     # ============== DL ===============================
-    prev = get_block_set(N_frames, decoded, b, bm, 0)
+    prev = get_block_set(N_frames-2, decoded, b, bm, 0)
     print(prev.shape)
     
-    B = get_block_set(N_frames, decoded, b, bm, 2)
+    B = get_block_set(N_frames-2, decoded, b, bm, 2)
     print(B.shape)
     # =================================================
 
