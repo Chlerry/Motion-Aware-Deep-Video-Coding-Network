@@ -2,3 +2,6 @@ __pycache__/*
 coarse16result/*
 models_new/*
 models/*
+dataset/BlowingBubbles_416x240_50_residue16result/
+w5-prediction-train-YL-0411.py
+w5-prediction-train-YL.py
