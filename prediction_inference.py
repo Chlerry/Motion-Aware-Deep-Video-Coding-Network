@@ -23,7 +23,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 
-from helper import psnr, load_imgs
+from helper import psnr, load_imgs, get_block_set
 from coarse_test import coarse16_test
 
 # ============== DL ===============================
@@ -61,71 +61,20 @@ def pred_inference(N_frames, b, bm, images, coarse_frames):
     
     decoded = np.array(decoded) # re-group the decoded frames
     
-    prev = []
-    
-    for i in range(0, N_frames-2): # take the reference frames
-        img = decoded[i] # frame the decoded frames
-        
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
-                block = np.zeros((b, b, 3))
-                if (y + b) >= img.shape[0] and (x + b) < img.shape[1] :
-                    block = img[y-bm:y-bm+b, x:x+b]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)
-                elif (x + b) >= img.shape[1] and (y + b) < img.shape[0]:
-                    block = img[y:y+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    prev.append(block)
-                elif (y + b) >= img.shape[0] and (x + b) >= img.shape[1] :
-                    block = img[y-bm:y-bm+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    prev.append(block)
-                else:
-                    block = img[y:y + b, x:x + b]
-                    block = block.reshape(b*b, 3)
-                    prev.append(block)
-    
-                
-    prev = np.array(prev)
-    prev = prev.reshape(prev.shape[0], b, b, 3)
+    # ============== DL ===============================
+    prev = get_block_set(N_frames, decoded, b, bm, 0)
     print(prev.shape)
     
-    B = []
-    
-    for i in range(0, N_frames-2): 
-        next_f = decoded[i+2]
-        
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
-                if (y + b) >= img.shape[0] and (x + b) < img.shape[1] :
-                    block = next_f[y-bm:y-bm+b, x:x+b]
-                    block = block.reshape(b*b,3)
-                    B.append(block)
-                elif (x + b) >= img.shape[1] and (y + b) < img.shape[0]:
-                    block = next_f[y:y+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    B.append(block)
-                elif (y + b) >= img.shape[0] and (x + b) >= img.shape[1] :
-                    block = next_f[y-bm:y-bm+b, x-bm:x-bm+b]
-                    block = block.reshape(b*b, 3)
-                    B.append(block)
-                else:
-                    block = next_f[y:y + b, x:x + b]
-                    block = block.reshape(b*b, 3)
-                    B.append(block)
-    
-
-    B = np.array(B)
-    B = B.reshape(B.shape[0], b, b, 3)
+    B = get_block_set(N_frames, decoded, b, bm, 2)
     print(B.shape)
+    # =================================================
     
     C = []
     
     for i in range(0, N_frames-2): 
         current = images[i+1]
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
+        for y in range(0, decoded[0].shape[0], bm):
+            for x in range(0, decoded[0].shape[1], bm):
                 block = current[y:y + bm, x:x + bm]
                 block = block.reshape(bm*bm, 3)
                 C.append(block)
