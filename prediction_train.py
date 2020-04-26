@@ -22,7 +22,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
-from helper import psnr, load_imgs
+from helper import psnr, load_imgs, get_block_set
 from coarse_test import coarse16_test
 
 # ============== DL ===============================
@@ -65,130 +65,18 @@ def pred_train(folder, start, end, b, bm):
     
     decoded = np.array(decoded) # re-group the decoded frames
     
-    prev = []
-    
-    for i in range(0, N_frames-2): # take the reference frames
-        img = decoded[i] # frame the decoded frames
-        
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
-                block = np.zeros((b, b, 3))              
-                # bottom L
-                if (y + bm/2+b/2) >= img.shape[0] and (x+bm/2 - b/2) < 0 :
-                    block = img[y+bm-b:y+bm, x:x+b]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)               
-                # bottom R
-                elif (y + bm/2+b/2) >= img.shape[0] and (x+bm/2 + b/2) >= img.shape[1] :
-                    block = img[y+bm-b:y+bm, x+bm-b:x+bm]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)
-                # top L
-                elif (y + bm/2-b/2) < 0 and (x+bm/2 - b/2) < 0 :
-                    block = img[y:y+b, x:x+b]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)                    
-                # top R
-                elif (y + bm/2-b/2) < 0 and (x+bm/2 + b/2) >= img.shape[1] :
-                    block = img[y:y+b, x+bm-b:x+bm]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)            
-                # top row
-                elif (y + bm/2-b/2) < 0 :
-                    block = img[y:y+b, int(x+bm/2-b/2):int(x+bm/2+b/2)]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)                    
-                # bottom row
-                elif (y + bm/2+b/2) >= img.shape[0] :
-                    block = img[y+bm-b:y+bm, int(x+bm/2-b/2):int(x+bm/2+b/2)]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)                    
-                # left column
-                elif (x+bm/2 - b/2) < 0 :
-                    block = img[int(y+bm/2-b/2):int(y+bm/2+b/2), x:x+b]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)                    
-                # right column
-                elif (x+bm/2 + b/2) >= img.shape[1] :
-                    block = img[int(y+bm/2-b/2):int(y+bm/2+b/2), x+bm-b:x+bm]
-                    block = block.reshape(b*b,3)
-                    prev.append(block)                   
-                else: # normal
-                    block = img[int(y+bm/2-b/2):int(y+bm/2+b/2), int(x+bm/2-b/2):int(x+bm/2+b/2)]
-                    block = block.reshape(b*b, 3)
-                    prev.append(block)
-    
-                
-    prev = np.array(prev)
-    prev = prev.reshape(prev.shape[0], b, b, 3)
+    prev = get_block_set(N_frames, decoded, b, bm, 0)
     print(prev.shape)
     
-    B = []
-    
-    for i in range(0, N_frames-2): 
-        next_f = decoded[i+2]
-    
-        # yL: new
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
-                #block = np.zeros((b, b, 3))              
-                # bottom L
-                if (y + bm/2+b/2) >= img.shape[0] and (x+bm/2 - b/2) < 0 :
-                    block = next_f[y+bm-b:y+bm, x:x+b]
-                    block = block.reshape(b*b,3)
-                    B.append(block)               
-                # bottom R
-                elif (y + bm/2+b/2) >= img.shape[0] and (x+bm/2 + b/2) >= img.shape[1] :
-                    block = next_f[y+bm-b:y+bm, x+bm-b:x+bm]
-                    block = block.reshape(b*b,3)
-                    B.append(block)
-                # top L
-                elif (y + bm/2-b/2) < 0 and (x+bm/2 - b/2) < 0 :
-                    block = next_f[y:y+b, x:x+b]
-                    block = block.reshape(b*b,3)
-                    B.append(block)                    
-                # top R
-                elif (y + bm/2-b/2) < 0 and (x+bm/2 + b/2) >= img.shape[1] :
-                    block = next_f[y:y+b, x+bm-b:x+bm]
-                    block = block.reshape(b*b,3)
-                    B.append(block)            
-                # top row
-                elif (y + bm/2-b/2) < 0 :
-                    block = next_f[y:y+b, int(x+bm/2-b/2):int(x+bm/2+b/2)]
-                    block = block.reshape(b*b,3)
-                    B.append(block)                    
-                # bottom row
-                elif (y + bm/2+b/2) >= img.shape[0] :
-                    block = next_f[y+bm-b:y+bm, int(x+bm/2-b/2):int(x+bm/2+b/2)]
-                    block = block.reshape(b*b,3)
-                    B.append(block)                    
-                # left column
-                elif (x+bm/2 - b/2) < 0 :
-                    block = next_f[int(y+bm/2-b/2):int(y+bm/2+b/2), x:x+b]
-                    block = block.reshape(b*b,3)
-                    B.append(block)                    
-                # right column
-                elif (x+bm/2 + b/2) >= img.shape[1] :
-                    block = next_f[int(y+bm/2-b/2):int(y+bm/2+b/2), x+bm-b:x+bm]
-                    block = block.reshape(b*b,3)
-                    B.append(block)                   
-                else: # normal
-                    block = next_f[int(y+bm/2-b/2):int(y+bm/2+b/2), int(x+bm/2-b/2):int(x+bm/2+b/2)]
-                    block = block.reshape(b*b, 3)
-                    B.append(block)
-    
-    
-                
-    B = np.array(B)
-    B = B.reshape(B.shape[0], b, b, 3)
+    B = get_block_set(N_frames, decoded, b, bm, 2)
     print(B.shape)
     
     C = []
     
     for i in range(0, N_frames-2): 
         current = images[i+1]
-        for y in range(0, img.shape[0], bm):
-            for x in range(0, img.shape[1], bm):
+        for y in range(0, decoded[0].shape[0], bm):
+            for x in range(0, decoded[0].shape[1], bm):
                 block = current[y:y + bm, x:x + bm]
                 block = block.reshape(bm*bm, 3)
                 C.append(block)
@@ -246,7 +134,7 @@ def pred_train(folder, start, end, b, bm):
     checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_pred16_0411.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
-    pred_model.fit([prev, B], C, batch_size=10, epochs=5, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+    pred_model.fit([prev, B], C, batch_size=10, epochs=3, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     # ===================================================
 
     
