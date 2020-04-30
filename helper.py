@@ -33,6 +33,28 @@ def get_coarse_set(images, b):
 
     return coarse_set2
 
+def regroup(N_frames, images_shape, bm, predicted_frames):
+    
+    width, height = images_shape[1], images_shape[2]
+    
+    final_prediction=[]
+    
+    i = 0
+    for n in range(N_frames):
+        result = np.zeros((width, height, 3))
+        
+        for y in range(0, width, bm):
+           for x in range(0, height, bm):
+               res = x
+               result[y:y + bm, x:x + bm,:] = predicted_frames[i].reshape(bm,bm,3)
+               i = i + 1
+              
+        final_prediction.append(result)
+    
+    final_prediction = np.array(final_prediction) # re-group the decoded frames
+        
+    return final_prediction
+
 def get_block_set(N_frames, decoded, b, bm, skip): 
     block_set = []
 

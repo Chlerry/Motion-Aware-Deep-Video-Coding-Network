@@ -23,8 +23,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
-from residue_train import regroup
-from helper import psnr, load_imgs
+from helper import psnr, load_imgs, regroup
 from coarse_test import coarse16_test
 from prediction_inference import pred_inference
 from prediction_inference_b1 import pred_inference_b1
