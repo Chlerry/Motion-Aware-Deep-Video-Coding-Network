@@ -1,19 +1,3 @@
-# =================================================
-# import keras
-# from keras.models import Model
-# from keras.layers import Input, Conv2D, Conv2DTranspose
-# import os
-# os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-# import matplotlib.pyplot as plt
-
-# from keras.optimizers import Adam
-# from keras.callbacks import ModelCheckpoint
-# from keras.callbacks import EarlyStopping
-
-# from skimage.measure import compare_ssim as ssim
-
-# SEED=42
-# =================================================
 import cv2
 import math
 import numpy as np
@@ -103,8 +87,6 @@ def coarse16_test(images, b):
     coarse_set = get_coarse_set(images, b)
     
     coarse_frames = coarse_model.predict(coarse_set)
-
-    #foldername = '/home/yingliu/Desktop/Rida/Code/BlowingBubbles_416x240_50_coarse16result/'
     
     return coarse_frames
 

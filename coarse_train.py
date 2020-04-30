@@ -1,18 +1,3 @@
-# =================================================
-# import math
-# import keras
-
-# import matplotlib.pyplot as plt
-
-# from skimage.measure import compare_ssim as ssim
-# from PIL import Image
-
-# =================================================
-# import os
-# os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-
-# SEED=42
-# =================================================
 import numpy as np
 from keras.layers import * # YL
 from keras.models import Model
@@ -71,9 +56,6 @@ def coarse16_train(f_start,f_end,folder):
     coarse_model = Model(inputs = input_coarse, outputs = d)
     coarse_model.summary()
     coarse_model.compile(optimizer='adam', loss='mse') # RK
-    # from keras.optimizers import Adam #YL
-    # from sklearn.metrics import mean_squared_error
-    # coarse_model.compile(optimizer=Adam(2e-4), loss='mean_squared_error', metrics=['acc']) # YL
     
     # ============== YL ===============================
     # save model and load model
