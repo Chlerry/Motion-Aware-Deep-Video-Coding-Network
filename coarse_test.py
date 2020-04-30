@@ -6,8 +6,8 @@ from sklearn.metrics import mean_squared_error
 from skimage.metrics import structural_similarity as ssim
 from PIL import Image
 
-from test_result import coarse_results
-from helper import psnr, load_imgs, get_coarse_set
+from utility.test_result import coarse_results
+from utility.helper import psnr, load_imgs, get_coarse_set
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
