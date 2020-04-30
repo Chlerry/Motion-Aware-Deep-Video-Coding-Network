@@ -75,7 +75,7 @@ def pred_train(folder, start, end, b, bm):
 
     C = []
     
-    for i in range(0, N_frames - 4): 
+    for i in range(2, N_frames - 2): 
         current = images[i + 2]
         for y in range(0, decoded[0].shape[0], bm):
             for x in range(0, decoded[0].shape[1], bm):
@@ -133,7 +133,7 @@ def pred_train(folder, start, end, b, bm):
     checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_pred16_b1.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
-    pred_model.fit([prev, B], C, batch_size=1000, epochs=1, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+    pred_model.fit([prev, B], C, batch_size=1000, epochs=200, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     # ===================================================
 
     
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     folder = './dataset/BlowingBubbles_416x240_50/'
     
     b = 16 # blk_size & ref. blk size
-    train_start, train_end = 0, 60
+    train_start, train_end = 0, 100
     
     bm = 8 # target block size to predict
     pred_train(folder,train_start, train_end, b, bm)

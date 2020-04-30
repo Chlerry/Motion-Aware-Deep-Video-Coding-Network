@@ -22,8 +22,11 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
+
 from helper import psnr, load_imgs, get_block_set
 from coarse_test import coarse16_test
+from residue_train import regroup
+from prediction_inference_b1 import pred_inference_b1
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -39,18 +42,13 @@ if gpus:
         print(e)
 # =================================================
 
-def pred_train(folder, start, end, b, bm):
-    
-    N_frames = end - start
-    
-    images = load_imgs(folder, start, end)
-    coarse_frames = coarse16_test(images, b)
-    
+def pred_train_b23(N_frames, b, bm, coarse_frames, final_prediction, images):
+
     width, height = images.shape[1], images.shape[2]
 
     N_blocks = int((width*height)/(b*b))
     
-    decoded = []
+    prev_decoded = []
     f = coarse_frames.reshape(N_frames, N_blocks, b*b, 3)
     for n in f:
         result = np.zeros((width, height, 3))
@@ -61,24 +59,25 @@ def pred_train(folder, start, end, b, bm):
                result[y:y + b, x:x + b] = res
                i = i + 1
               
-        decoded.append(result)
+        prev_decoded.append(result)
     
-    decoded = np.array(decoded) # re-group the decoded frames
+    prev_decoded = np.array(prev_decoded[:N_frames - 4]) # re-group the prev_decoded frames
     
+    print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
     # ============== DL ===============================
-    prev = get_block_set(N_frames-2, decoded, b, bm, 0)
+    prev = get_block_set(N_frames-4, prev_decoded, b, bm, 0)
     print(prev.shape)
     
-    B = get_block_set(N_frames-2, decoded, b, bm, 2)
+    B = get_block_set(N_frames-4, final_prediction, b, bm, 0)
     print(B.shape)
     # =================================================
 
     C = []
     
-    for i in range(0, N_frames-2): 
+    for i in range(1, N_frames - 3): 
         current = images[i+1]
-        for y in range(0, decoded[0].shape[0], bm):
-            for x in range(0, decoded[0].shape[1], bm):
+        for y in range(0, images[0].shape[0], bm):
+            for x in range(0, images[0].shape[1], bm):
                 block = current[y:y + bm, x:x + bm]
                 block = block.reshape(bm*bm, 3)
                 C.append(block)
@@ -124,7 +123,7 @@ def pred_train(folder, start, end, b, bm):
     # from keras.models import model_from_json
     # serialize model to JSON
     model_json = pred_model.to_json()
-    with open("./models/BlowingBubbles_416x240_50_pred16.json", "w") as json_file:
+    with open("./models/BlowingBubbles_416x240_50_pred16_b23.json", "w") as json_file:
         json_file.write(model_json)
 
     
@@ -133,23 +132,26 @@ def pred_train(folder, start, end, b, bm):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_pred16.hdf5',\
+    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_pred16_b23.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     pred_model.fit([prev, B], C, batch_size=1000, epochs=200, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     # ===================================================
 
-    
 if __name__ == "__main__":   
-    folder = './dataset/BlowingBubbles_416x240_50/'
     
+    folder = './dataset/BlowingBubbles_416x240_50/'
     b = 16 # blk_size & ref. blk size
     train_start, train_end = 0, 100
     
-    #coarse_frames = coarse16_pred(folder, test_start, test_end)
+    images = load_imgs(folder, train_start, train_end)
+    coarse_frames = coarse16_test(images, b)
     bm = 8 # target block size to predict
-    pred_train(folder,train_start, train_end, b, bm)
-    #amse, apsnr, assim = coarse16_test(test_start,test_end,folder, b)
-    # print('average test mse:',amse)
-    # print('average test psnr:',apsnr)
-    # print('average test ssim:',assim)
+
+    N_frames = train_end - train_start
+    predicted_frames = pred_inference_b1(N_frames, b, bm, images.shape, coarse_frames)
+    final_prediction = regroup(N_frames - 4, images.shape, bm, predicted_frames)
+    print(predicted_frames.shape)
+    print(final_prediction.shape)
+
+    pred_train_b23(N_frames, b, bm, coarse_frames, final_prediction, images)

@@ -25,6 +25,8 @@ from keras.callbacks import EarlyStopping
 from helper import psnr, load_imgs
 from coarse_test import coarse16_test
 from prediction_inference import pred_inference
+from prediction_inference_b1 import pred_inference_b1
+from prediction_inference_b23 import pred_inference_b23
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -62,22 +64,16 @@ def regroup(N_frames, images_shape, bm, predicted_frames):
         
     return final_prediction
       
-def residue_train(folder, start, end, bm, b, pred):
-    N_frames = end-start # including the ref. frames
-
-    images = load_imgs(folder, start+1, end-1)
-    
-    print(images.shape)
+def residue_train(N_frames, bm, b, images, predicted_b1_frame):
 
     width, height = images.shape[1], images.shape[2]
-    
    
-    residue = images - pred
-    print(residue.shape)
+    residue = images - predicted_b1_frame
+    # print(residue.shape)
     
     C = []
     
-    for i in range(0, N_frames-2): 
+    for i in range(0, N_frames-4): 
         current = residue[i]
         for y in range(0, width, b):
             for x in range(0, height, b):
@@ -87,7 +83,7 @@ def residue_train(folder, start, end, bm, b, pred):
     
     C = np.array(C)
     C = C.reshape(C.shape[0], b, b, 3)
-    print(C.shape)
+    # print(C.shape)
     
     input1 = Input(shape = (b, b, 3))
     
@@ -108,7 +104,7 @@ def residue_train(folder, start, end, bm, b, pred):
     # save model
    
     model_json = residue_model.to_json()
-    with open("./models/BlowingBubbles_416x240_50_residue16.json", "w") as json_file:
+    with open("./models/BlowingBubbles_416x240_50_residue16_b23.json", "w") as json_file:
         json_file.write(model_json)
 
     
@@ -117,25 +113,33 @@ def residue_train(folder, start, end, bm, b, pred):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_residue16.hdf5',\
+    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_residue16_b23.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     residue_model.fit(C, C, batch_size=1000, epochs=500, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     
 if __name__ == "__main__":   
-    folder = './dataset/BlowingBubbles_416x240_50/'
     
+    folder = './dataset/BlowingBubbles_416x240_50/'
     b = 16 # blk_size & ref. blk size
-    test_start, test_end = 100, 200
     train_start, train_end = 0, 100
-
-    images =  load_imgs(folder, train_start, train_end)
+    N_frames = train_end - train_start
+    
+    images = load_imgs(folder, train_start, train_end)
     coarse_frames = coarse16_test(images, b)
     bm = 8 # target block size to predict
 
-    N_frames = train_end - train_start
-    predicted_frames = pred_inference(N_frames, b, bm, images, coarse_frames)
-    final_prediction = regroup(N_frames - 2, images.shape, bm, predicted_frames)
- 
-    residue_train(folder, train_start, train_end, bm, b, final_prediction)
+    predicted_b1 = pred_inference_b1(N_frames, b, bm, images.shape, coarse_frames)
+    predicted_b1_frame = regroup(N_frames - 4, images.shape, bm, predicted_b1)
+
+    coarse_frames1 = coarse16_test(images[:N_frames - 4], b)
+    predicted_b23 = pred_inference_b23(N_frames, b, bm, images.shape, coarse_frames1, predicted_b1_frame)
+    predicted_b23_frame = regroup(N_frames - 4, images.shape, bm, predicted_b23)
+
+    print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+    print(predicted_b23_frame.shape)
+
+    images = images[1:N_frames - 3]
+    print(images.shape)
+    residue_train(N_frames, bm, b, images, predicted_b1_frame)
     

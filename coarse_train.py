@@ -55,7 +55,7 @@ def coarse16_train(f_start,f_end,folder):
     
     input_coarse = Input(shape = (b, b, 3))
     
-    e = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = (4,4), activation='relu', input_shape=(b, b, 3))(input_coarse)
+    e = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = (2,4), activation='relu', input_shape=(b, b, 3))(input_coarse)
     print(e.shape)
     #e = MaxPool2D(strides=(2,2))(e)
     # stride (1,1)
@@ -66,7 +66,7 @@ def coarse16_train(f_start,f_end,folder):
     
     d = Conv2DTranspose(64, kernel_size=(5, 5), padding = "SAME", strides = (1,1), activation='relu')(e)
     d = Conv2DTranspose(128, kernel_size=(5, 5), padding = "SAME", strides = (1,1), activation='relu')(d)
-    d = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = (4, 4), activation='relu')(d)
+    d = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = (2, 4), activation='relu')(d)
     
     coarse_model = Model(inputs = input_coarse, outputs = d)
     coarse_model.summary()
@@ -92,11 +92,11 @@ def coarse16_train(f_start,f_end,folder):
     checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_coarse16.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
-    coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=10, epochs=10, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+    coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=1000, epochs=1000, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     # ===================================================
 
 if __name__ == "__main__":   
     folder = './dataset/BlowingBubbles_416x240_50/'
     b = 16 # blk_size
-    train_start, train_end = 0, 100
+    train_start, train_end = 0, 500
     coarse16_train(train_start,train_end, folder)

@@ -25,6 +25,8 @@ from keras.callbacks import EarlyStopping
 
 from helper import psnr, load_imgs, get_block_set
 from coarse_test import coarse16_test
+from residue_train import regroup
+from prediction_inference_b1 import pred_inference_b1
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -40,31 +42,32 @@ if gpus:
         print(e)
 # =================================================
 
-def pred_inference_b1(N_frames, b, bm, images_shape, decoded):
-    
+def pred_inference_b23(N_frames, b, bm, images_shape, prev_decoded, predicted_b1_frame):
+        
     # ============== DL ===============================
-    prev = get_block_set(N_frames - 4, decoded, b, bm, 0)
+    prev = get_block_set(N_frames-4, prev_decoded, b, bm, 0)
     # print(prev.shape)
     
-    B = get_block_set(N_frames - 4, decoded, b, bm, 4)
+    B = get_block_set(N_frames-4, predicted_b1_frame, b, bm, 0)
     # print(B.shape)
+    # =================================================
     
     # ============== YL: load model ===============================
     
     from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_pred16_b1.json', 'r')
+    json_file = open('./models/BlowingBubbles_416x240_50_pred16_b23.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     pred_model = model_from_json(loaded_model_json)
     # load weights into new model
-    pred_model.load_weights("./models/BlowingBubbles_416x240_50_pred16_b1.hdf5")
+    pred_model.load_weights("./models/BlowingBubbles_416x240_50_pred16_b23.hdf5")
     print("Loaded model from disk")
     
     # evaluate loaded model on test data
     pred_model.compile(optimizer='adam', loss='mse', metrics=['acc'])
 
-    predicted_frames = pred_model.predict([prev, B])
-    return predicted_frames
+    predicted_b23 = pred_model.predict([prev, B])
+    return predicted_b23
     # ===================================================
     
 if __name__ == "__main__":   
@@ -72,11 +75,16 @@ if __name__ == "__main__":
     folder = './dataset/BlowingBubbles_416x240_50/'
     b = 16 # blk_size & ref. blk size
     test_start, test_end = 100, 200
+    N_frames = test_end - test_start
     
     images = load_imgs(folder, test_start, test_end)
     coarse_frames = coarse16_test(images, b)
     bm = 8 # target block size to predict
 
-    N_frames = test_end - test_start
-    predicted_frames = pred_inference_b1(N_frames, b, bm, images.shape, coarse_frames)
-    # print(predicted_frames.shape)
+    predicted_b1 = pred_inference_b1(N_frames, b, bm, images.shape, coarse_frames)
+    predicted_b1_frame = regroup(N_frames - 4, images.shape, bm, predicted_b1)
+    print(predicted_b1.shape)
+    print(predicted_b1_frame.shape)
+
+    coarse_frames1 = coarse16_test(images[:N_frames - 4], b)
+    predicted_b23 = pred_inference_b23(N_frames, b, bm, images.shape, coarse_frames1, predicted_b1_frame)
