@@ -73,12 +73,12 @@ def results(coarse_frames, images, foldername,  test_start, test_end, b):
 def coarse16_test(images, b):
     
     from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_coarse16.json', 'r')
+    json_file = open('./models/BlowingBubbles_416x240_50_coarse12.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     coarse_model = model_from_json(loaded_model_json)
     # load weights into new model
-    coarse_model.load_weights("./models/BlowingBubbles_416x240_50_coarse16.hdf5")
+    coarse_model.load_weights("./models/BlowingBubbles_416x240_50_coarse12.hdf5")
     print("Loaded model from disk")
     
     # evaluate loaded model on test data
