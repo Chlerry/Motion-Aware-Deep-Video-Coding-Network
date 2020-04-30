@@ -105,7 +105,7 @@ if __name__ == "__main__":
     
     folder = './dataset/BlowingBubbles_416x240_50/'
     b = 16 # blk_size & ref. blk size
-    test_start, test_end = 100, 120
+    test_start, test_end = 100, 200
     
     images = load_imgs(folder, test_start, test_end)
     coarse_frames = coarse16_test(images, b)

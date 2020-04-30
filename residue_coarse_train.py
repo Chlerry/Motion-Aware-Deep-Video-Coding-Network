@@ -62,17 +62,31 @@ def regroup(N_frames, images_shape, bm, predicted_frames):
         
     return final_prediction
       
-def residue_train(folder, start, end, bm, b, pred):
-    N_frames = end-start # including the ref. frames
-
-    images = load_imgs(folder, start+1, end-1)
+def residue_train(N_frames, bm, b, images, coarse_frames):
     
     print(images.shape)
 
     width, height = images.shape[1], images.shape[2]
+
+    N_blocks = int((width*height)/(b*b))
+    
+    decoded = []
+    f = coarse_frames.reshape(N_frames, N_blocks, b*b, 3)
+    for n in f:
+        result = np.zeros((width, height, 3))
+        i = 0
+        for y in range(0, result.shape[0], b):
+           for x in range(0, result.shape[1], b):
+               res = n[i].reshape(b,b, 3)
+               result[y:y + b, x:x + b] = res
+               i = i + 1
+              
+        decoded.append(result)
+    decoded = np.array(decoded) # re-group the decoded frames
+    print(decoded.shape)
     
    
-    residue = images - pred
+    residue = images - decoded
     print(residue.shape)
     
     C = []
@@ -108,7 +122,7 @@ def residue_train(folder, start, end, bm, b, pred):
     # save model
    
     model_json = residue_model.to_json()
-    with open("./models/BlowingBubbles_416x240_50_residue16.json", "w") as json_file:
+    with open("./models/BlowingBubbles_416x240_50_residue16_coarse.json", "w") as json_file:
         json_file.write(model_json)
 
     
@@ -117,7 +131,7 @@ def residue_train(folder, start, end, bm, b, pred):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_residue16.hdf5',\
+    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_residue16_coarse.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     residue_model.fit(C, C, batch_size=1000, epochs=500, verbose=2, validation_split=0.2, callbacks=callbacks_list)
@@ -126,16 +140,12 @@ if __name__ == "__main__":
     folder = './dataset/BlowingBubbles_416x240_50/'
     
     b = 16 # blk_size & ref. blk size
-    test_start, test_end = 100, 200
-    train_start, train_end = 0, 100
+    train_start, train_end = 0, 500
 
-    images =  load_imgs(folder, train_start, train_end)
+    images = load_imgs(folder, train_start, train_end)
     coarse_frames = coarse16_test(images, b)
     bm = 8 # target block size to predict
-
+    
     N_frames = train_end - train_start
-    predicted_frames = pred_inference(N_frames, b, bm, images, coarse_frames)
-    final_prediction = regroup(N_frames - 2, images.shape, bm, predicted_frames)
- 
-    residue_train(folder, train_start, train_end, bm, b, final_prediction)
+    residue_train(N_frames, bm, b, images, coarse_frames)
     

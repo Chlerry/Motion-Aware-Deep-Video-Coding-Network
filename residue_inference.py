@@ -82,37 +82,37 @@ def residue_inference(folder, start, end, pred, folder_save): # start
     print(residue.shape)
     
     
-    # =================== reshape original images ===============
-    C_ori = []
+    # # =================== reshape original images ===============
+    # C_ori = []
     
-    for i in range(0, N_frames-2): 
-        current = images[i]
-        for y in range(0, width, b):
-            for x in range(0, height, b):
-                block = current[y:y + b, x:x + b]
-                block = block.reshape(b*b, 3)
-                C_ori.append(block)
+    # for i in range(0, N_frames-2): 
+    #     current = images[i]
+    #     for y in range(0, width, b):
+    #         for x in range(0, height, b):
+    #             block = current[y:y + b, x:x + b]
+    #             block = block.reshape(b*b, 3)
+    #             C_ori.append(block)
     
-    C_ori = np.array(C_ori)
-    C_ori = C_ori.reshape(C_ori.shape[0], b, b, 3)
-    print(C_ori.shape) # original blocks
-    # ======================================================
+    # C_ori = np.array(C_ori)
+    # C_ori = C_ori.reshape(C_ori.shape[0], b, b, 3)
+    # print(C_ori.shape) # original blocks
+    # # ======================================================
     
-    # =================== reshape predicted images ===============
-    C_pred = []
+    # # =================== reshape predicted images ===============
+    # C_pred = []
     
-    for i in range(0, N_frames-2): 
-        current = pred[i]
-        for y in range(0, width, b):
-            for x in range(0, height, b):
-                block = current[y:y + b, x:x + b]
-                block = block.reshape(b*b, 3)
-                C_pred.append(block)
+    # for i in range(0, N_frames-2): 
+    #     current = pred[i]
+    #     for y in range(0, width, b):
+    #         for x in range(0, height, b):
+    #             block = current[y:y + b, x:x + b]
+    #             block = block.reshape(b*b, 3)
+    #             C_pred.append(block)
     
-    C_pred = np.array(C_pred)
-    C_pred = C_pred.reshape(C_pred.shape[0], b, b, 3)
-    print(C_pred.shape) # predicted blocks
-    # ======================================================
+    # C_pred = np.array(C_pred)
+    # C_pred = C_pred.reshape(C_pred.shape[0], b, b, 3)
+    # print(C_pred.shape) # predicted blocks
+    # # ======================================================
     
     C = []
     
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     folder_save = './dataset/BlowingBubbles_416x240_50_residue16result/'
     
     b = 16 # blk_size & ref. blk size
-    test_start, test_end = 100, 120
+    test_start, test_end = 100, 200
     
     images =  load_imgs(folder, test_start, test_end)
     coarse_frames = coarse16_test(images, b)
@@ -183,8 +183,16 @@ if __name__ == "__main__":
     N_frames = test_end - test_start
 
     predicted_frames = pred_inference(N_frames, b, bm, images, coarse_frames)
-    final_prediction = regroup(N_frames, images.shape, bm, predicted_frames)
+    final_prediction = regroup(N_frames - 2, images.shape, bm, predicted_frames)
     pred_amse, pred_apsnr, pred_assim = performance_evaluation(folder,test_start,test_end,final_prediction)
+
+    print('average test pred_amse:',pred_amse)
+    print('average test pred_apsnr:',pred_apsnr)
+    print('average test pred_assim:',pred_assim)
 
     final_frames = residue_inference(folder, test_start, test_end, final_prediction, folder_save)
     final_amse, final_apsnr, final_assim = performance_evaluation(folder,test_start,test_end,final_frames)
+    print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+    print('average test final_amse:',final_amse)
+    print('average test final_apsnr:',final_apsnr)
+    print('average test final_assim:',final_assim)
