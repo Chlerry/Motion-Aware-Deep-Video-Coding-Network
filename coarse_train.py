@@ -7,6 +7,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.helper import psnr, load_imgs, get_coarse_set
+from utility.parameter import *
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -33,8 +34,7 @@ if gpus:
 #         print(e)
 # =================================================
 
-def coarse16_train(f_start,f_end,folder):
-    images =  load_imgs(folder, f_start, f_end)  
+def model8(images, b):
 
     coarse_train_set = get_coarse_set(images, b)
     
@@ -62,7 +62,7 @@ def coarse16_train(f_start,f_end,folder):
     # from keras.models import model_from_json
     # serialize model to JSON
     model_json = coarse_model.to_json()
-    with open("./models/BlowingBubbles_416x240_50_coarse12.json", "w") as json_file:
+    with open(corse_train8_json, "w") as json_file:
         json_file.write(model_json)
 
     
@@ -71,14 +71,16 @@ def coarse16_train(f_start,f_end,folder):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_coarse12.hdf5',\
-                                   monitor='val_loss',save_best_only=True)
+    checkpointer = ModelCheckpoint(filepath = corse_train8_hdf5,\
+                                   monitor = 'val_loss', save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
-    coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=1000, epochs=1000, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+    coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=coarse_batch_size, epochs=coarse_epoch, verbose=2, validation_split=0.2, callbacks=callbacks_list)
     # ===================================================
 
 if __name__ == "__main__":   
-    folder = './dataset/BlowingBubbles_416x240_50/'
-    b = 16 # blk_size
+    data_dir = './dataset/BlowingBubbles_416x240_50/'
+    b = 16 
     train_start, train_end = 0, 100
-    coarse16_train(train_start,train_end, folder)
+
+    train_images = load_imgs(data_dir, train_start, train_end) 
+    model8(train_images, b)
