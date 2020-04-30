@@ -62,7 +62,7 @@ def coarse16_train(f_start,f_end,folder):
     # from keras.models import model_from_json
     # serialize model to JSON
     model_json = coarse_model.to_json()
-    with open("./models/BlowingBubbles_416x240_50_coarse16.json", "w") as json_file:
+    with open("./models/BlowingBubbles_416x240_50_coarse12.json", "w") as json_file:
         json_file.write(model_json)
 
     
@@ -71,7 +71,7 @@ def coarse16_train(f_start,f_end,folder):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_coarse16.hdf5',\
+    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_coarse12.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     coarse_model.fit(coarse_train_set, coarse_train_set, batch_size=1000, epochs=1000, verbose=2, validation_split=0.2, callbacks=callbacks_list)

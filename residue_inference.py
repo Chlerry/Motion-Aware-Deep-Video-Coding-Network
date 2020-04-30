@@ -129,12 +129,12 @@ def residue_inference(folder, start, end, pred, folder_save): # start
     
 # load residue16 model
     from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_residue16.json', 'r')
+    json_file = open('./models/BlowingBubbles_416x240_50_residue12.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     residue_model = model_from_json(loaded_model_json)
     # load weights into new model
-    residue_model.load_weights("./models/BlowingBubbles_416x240_50_residue16.hdf5")
+    residue_model.load_weights("./models/BlowingBubbles_416x240_50_residue12.hdf5")
     print("Loaded model from disk")
     
     residue_decoded = residue_model.predict([C])

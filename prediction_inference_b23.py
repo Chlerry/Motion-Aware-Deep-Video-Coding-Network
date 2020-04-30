@@ -54,12 +54,12 @@ def pred_inference_b23(N_frames, b, bm, images_shape, prev_decoded, predicted_b1
     # ============== YL: load model ===============================
     
     from keras.models import model_from_json
-    json_file = open('./models/BlowingBubbles_416x240_50_pred16_b23.json', 'r')
+    json_file = open('./models/BlowingBubbles_416x240_50_pred12_b23.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     pred_model = model_from_json(loaded_model_json)
     # load weights into new model
-    pred_model.load_weights("./models/BlowingBubbles_416x240_50_pred16_b23.hdf5")
+    pred_model.load_weights("./models/BlowingBubbles_416x240_50_pred12_b23.hdf5")
     print("Loaded model from disk")
     
     # evaluate loaded model on test data

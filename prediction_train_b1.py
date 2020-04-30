@@ -121,7 +121,7 @@ def pred_train(folder, start, end, b, bm):
     # from keras.models import model_from_json
     # serialize model to JSON
     model_json = pred_model.to_json()
-    with open("./models/BlowingBubbles_416x240_50_pred16_b1.json", "w") as json_file:
+    with open("./models/BlowingBubbles_416x240_50_pred12_b1.json", "w") as json_file:
         json_file.write(model_json)
 
     
@@ -130,7 +130,7 @@ def pred_train(folder, start, end, b, bm):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_pred16_b1.hdf5',\
+    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_pred12_b1.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     pred_model.fit([prev, B], C, batch_size=1000, epochs=200, verbose=2, validation_split=0.2, callbacks=callbacks_list)

@@ -119,14 +119,14 @@ if __name__ == "__main__":
     folder = './dataset/BasketballDrill_832x480_50/'
     folder_save = './dataset/BasketballDrill_832x480_50_residue12result/'
 
-    coarse_json_dir = './models/BlowingBubbles_416x240_50_residue16_coarse.json'
-    coarse_hdf5_dir = "./models/BlowingBubbles_416x240_50_residue16_coarse.hdf5"
+    coarse_json_dir = './models/BlowingBubbles_416x240_50_residue12_coarse.json'
+    coarse_hdf5_dir = "./models/BlowingBubbles_416x240_50_residue12_coarse.hdf5"
 
-    b1_json_dir = './models/BlowingBubbles_416x240_50_residue16_b1.json'
-    b1_hdf5_dir = "./models/BlowingBubbles_416x240_50_residue16_b1.hdf5"
+    b1_json_dir = './models/BlowingBubbles_416x240_50_residue12_b1.json'
+    b1_hdf5_dir = "./models/BlowingBubbles_416x240_50_residue12_b1.hdf5"
 
-    b23_json_dir = './models/BlowingBubbles_416x240_50_residue16_b23.json'
-    b23_hdf5_dir = "./models/BlowingBubbles_416x240_50_residue16_b23.hdf5"
+    b23_json_dir = './models/BlowingBubbles_416x240_50_residue12_b23.json'
+    b23_hdf5_dir = "./models/BlowingBubbles_416x240_50_residue12_b23.hdf5"
 
     
     b = 16 # blk_size & ref. blk size

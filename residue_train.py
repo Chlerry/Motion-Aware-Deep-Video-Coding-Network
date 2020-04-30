@@ -86,7 +86,7 @@ def residue_train(folder, start, end, bm, b, pred):
     # save model
    
     model_json = residue_model.to_json()
-    with open("./models/BlowingBubbles_416x240_50_residue16.json", "w") as json_file:
+    with open("./models/BlowingBubbles_416x240_50_residue12.json", "w") as json_file:
         json_file.write(model_json)
 
     
@@ -95,7 +95,7 @@ def residue_train(folder, start, end, bm, b, pred):
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
     # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_residue16.hdf5',\
+    checkpointer = ModelCheckpoint(filepath='./models/BlowingBubbles_416x240_50_residue12.hdf5',\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
     residue_model.fit(C, C, batch_size=1000, epochs=500, verbose=2, validation_split=0.2, callbacks=callbacks_list)
