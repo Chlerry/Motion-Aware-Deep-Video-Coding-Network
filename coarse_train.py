@@ -6,7 +6,7 @@ from keras.models import Model
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
-from helper import psnr, load_imgs, get_coarse_set
+from utility.helper import psnr, load_imgs, get_coarse_set
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -80,5 +80,5 @@ def coarse16_train(f_start,f_end,folder):
 if __name__ == "__main__":   
     folder = './dataset/BlowingBubbles_416x240_50/'
     b = 16 # blk_size
-    train_start, train_end = 0, 500
+    train_start, train_end = 0, 100
     coarse16_train(train_start,train_end, folder)

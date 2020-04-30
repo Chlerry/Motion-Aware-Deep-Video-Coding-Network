@@ -12,28 +12,8 @@ from sklearn.metrics import mean_squared_error
 from skimage.metrics import structural_similarity as ssim
 from PIL import Image
 
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import EarlyStopping
-
-SEED=42
-
-def psnr(img_true, img_recovered):    
-    pixel_max = 255.0
-    mse = np.mean((img_true-img_recovered)**2)
-    p = 20 * math.log10( pixel_max / math.sqrt( mse ))
-    return p
-
-
-def load_imgs(path, start, end):
-    train_set = []
-    for n in range(start, end):
-        fname = path +  str(n) + ".png"
-        img = cv2.imread(fname, 1)
-        if img is not None:
-                train_set.append(img)
-    train_set = np.array(train_set)
-    return train_set
+from utility.test_result import coarse_results
+from utility.helper import psnr, load_imgs, get_coarse_set
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
