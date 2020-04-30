@@ -114,21 +114,6 @@ def coarse16_test(images, b):
     coarse_set = get_coarse_set(images, b)
     
     coarse_frames = coarse_model.predict(coarse_set)
-    coarse_set = []
-    for i in range(0, images.shape[0]): 
-        img = images[i]
-        for y in range(0, img.shape[0], b):
-            for x in range(0, img.shape[1], b):
-                block = img[y:y + b, x:x + b]
-                block = block.reshape(b*b, 3)
-                coarse_set.append(block)
-    
-    coarse_set = np.array(coarse_set)
-    coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b, b, 3)
-    
-    coarse_frames = coarse_model.predict(coarse_set2)
-
-    #foldername = '/home/yingliu/Desktop/Rida/Code/BlowingBubbles_416x240_50_coarse16result/'
     
     return coarse_frames
 
