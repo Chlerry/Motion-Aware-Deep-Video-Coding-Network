@@ -22,7 +22,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
-from helper import psnr, load_imgs
+from helper import psnr, load_imgs, regroup
 from coarse_test import coarse16_test
 from prediction_inference import pred_inference
 
@@ -39,28 +39,6 @@ if gpus:
     except RuntimeError as e:
         print(e)
 # =================================================
-
-def regroup(N_frames, images_shape, bm, predicted_frames):
-    
-    width, height = images_shape[1], images_shape[2]
-    
-    final_prediction=[]
-    
-    i = 0
-    for n in range(N_frames):
-        result = np.zeros((width, height, 3))
-        
-        for y in range(0, width, bm):
-           for x in range(0, height, bm):
-               res = x
-               result[y:y + bm, x:x + bm,:] = predicted_frames[i].reshape(bm,bm,3)
-               i = i + 1
-              
-        final_prediction.append(result)
-    
-    final_prediction = np.array(final_prediction) # re-group the decoded frames
-        
-    return final_prediction
       
 def residue_train(folder, start, end, bm, b, pred):
     N_frames = end-start # including the ref. frames
