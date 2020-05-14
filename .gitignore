@@ -14,3 +14,5 @@ utility/__pycache__/*
 .spyproject/
 utility/__pycache__/helper.cpython-37.pyc
 coarse/__pycache__/
+prediction/__pycache__/
+residue/__pycache__/
