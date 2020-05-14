@@ -10,3 +10,6 @@ results
 utility/__pycache__
 spie.ipynb
 .ipynb_checkpoints/
+utility/__pycache__/*
+.spyproject/
+utility/__pycache__/helper.cpython-37.pyc
