@@ -1,0 +1,16 @@
+__pycache__/*
+coarse16result/*
+models_new/*
+dataset/BlowingBubbles_416x240_50_residue16result/
+w5-prediction-train-YL-0411.py
+w5-prediction-train-YL.py
+dataset/BasketballDrill_832x480_50_residue16result/
+results
+utility/__pycache__
+.ipynb_checkpoints/
+utility/__pycache__/*
+.spyproject/
+utility/__pycache__/helper.cpython-37.pyc
+coarse/__pycache__/
+prediction/__pycache__/
+residue/__pycache__/
