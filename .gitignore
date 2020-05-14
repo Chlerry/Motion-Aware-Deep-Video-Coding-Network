@@ -5,7 +5,6 @@ dataset/BlowingBubbles_416x240_50_residue16result/
 w5-prediction-train-YL-0411.py
 w5-prediction-train-YL.py
 dataset/BasketballDrill_832x480_50_residue16result/
-results
 utility/__pycache__
 .ipynb_checkpoints/
 utility/__pycache__/*
