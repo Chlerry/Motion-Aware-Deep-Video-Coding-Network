@@ -65,3 +65,20 @@ average test b2_assim: 0.6234968592517967
 
 # ---- residue b23 8 ----
 #  - 1s - loss: 52.3604 - val_loss: 157.5653
+
+
+
+train: I B I  -> origin prediction model 
+
+
+train: I B2 B1 B3 I -> new prediction model 
+test: new prediction model  -> result 1: 
+        average test b1_amse: 420.9544772609874
+        average test b1_apsnr: 22.036999683180216
+        average test b1_assim: 0.42808736336237585
+
+
+test: origin prediction model  -> result 2
+average test pred_amse: 319.93299939716917
+average test pred_apsnr: 23.154544287873634
+average test pred_assim: 0.5420849423061977
