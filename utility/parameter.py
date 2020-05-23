@@ -1,5 +1,5 @@
 # Set rtx_optimizer to turn on RTX 16bits float optimization
-rtx_optimizer = True
+rtx_optimizer = False
 
 # =========================================================================
 train_start, train_end = 0, 100
@@ -8,8 +8,8 @@ n_train_frames = train_end - train_start
 test_start, test_end = 100, 200
 n_test_frames = test_end - test_start
 
-training_ratio = 8
-testing_ratio = 8
+training_ratio = 12
+testing_ratio =  12
 # ============================== Directories ==============================
 from pathlib import Path
 # Get the absolute directoty (Unix Style) for SPIEcode-Daniel
@@ -54,6 +54,10 @@ def get_training_parameter(model):
     delta_switcher = {
         "coarse":           1.0,
         "prediction":       1.0,
+        "prediction_gnet":        1.0,
+        "prediction_gnet2":       1.0,
+        "prediction_gnet3":       1.0,
+        "prediction_gnet4":       1.0,
         "residue":          1.0,
         "prediction_b1":    1.0,
         "prediction_b23":   1.0,
@@ -65,35 +69,47 @@ def get_training_parameter(model):
     patience_switcher = {
         "coarse":           500,
         "prediction":       100,
+        "prediction_gnet":        100,
+        "prediction_gnet2":       100,
+        "prediction_gnet3":       100,
+        "prediction_gnet4":       100,
         "residue":          500,
-        "prediction_b1":    50,
-        "prediction_b23":   50,
-        "residue_b1":       200,
-        "residue_b23":      200
+        "prediction_b1":    10000,
+        "prediction_b23":   10000,
+        "residue_b1":       2000,
+        "residue_b23":      500
     }
     n_patience = patience_switcher.get(model, "Invalid Model");
 
     batch_switcher = {
         "coarse":           256,
         "prediction":       128,
-        "residue":          256,
-        "prediction_b1":    512,
-        "prediction_b23":   256,
-        "residue_b1":       256,
-        "residue_b23":      256
+        "prediction_gnet":       128,
+        "prediction_gnet2":      128,
+        "prediction_gnet3":      128,
+        "prediction_gnet4":      128,
+        "residue":          2048,
+        "prediction_b1":    128,
+        "prediction_b23":   128,
+        "residue_b1":       512,
+        "residue_b23":      512
     }
     batch_size = batch_switcher.get(model, "Invalid Model")
 
     epoch_switcher = {
-        "coarse":           1000,
-        "prediction":       1000,
-        "residue":          1000,
-        "prediction_b1":    1000,
-        "prediction_b23":   1000,
-        "residue_b1":       1000,
-        "residue_b23":      1000
+        "coarse":           2000,
+        "prediction":       2000,
+        "prediction_gnet":        2000,
+        "prediction_gnet2":       2000,
+        "prediction_gnet3":       2000,
+        "prediction_gnet4":       2000,
+        "residue":          2000,
+        "prediction_b1":    10000,
+        "prediction_b23":   2000,
+        "residue_b1":       2000,
+        "residue_b23":      2000
     }
     epoch_size = epoch_switcher.get(model, "Invalid Model")
-    epoch_size = 1
+    # epoch_size = 1
 
     return  delta, n_patience, batch_size, epoch_size
