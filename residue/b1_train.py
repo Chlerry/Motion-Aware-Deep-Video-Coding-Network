@@ -94,7 +94,7 @@ def main(args = 1):
 
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
 
-    residue_train(train_images[2:n_train_frames - 2], predicted_b1_frame, bm, b, 8)
+    residue_train(train_images[2:n_train_frames - 2], predicted_b1_frame, bm, b, training_ratio)
     
 if __name__ == "__main__":   
     import sys
