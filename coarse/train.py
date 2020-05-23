@@ -78,7 +78,6 @@ def model(images, b, ratio):
 
 def main(args = 1): 
     b = 16 
-    train_start, train_end = 0, 100
 
     train_images = load_imgs(data_dir, train_start, train_end) 
     

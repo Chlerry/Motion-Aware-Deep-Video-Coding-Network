@@ -34,7 +34,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def predict(decoded, b, bm, ratio):
+def predict(decoded, b, bm, ratio, model = "prediction"):
     
     N_frames = decoded.shape[0]
     # ============== DL ===============================
@@ -42,7 +42,7 @@ def predict(decoded, b, bm, ratio):
     
     B = get_block_set(N_frames-2, decoded, b, bm, 2)
     # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("prediction", ratio)
+    json_path, hdf5_path = get_model_path(model, ratio)
     # ============== YL: load model ===================
     
     from keras.models import model_from_json

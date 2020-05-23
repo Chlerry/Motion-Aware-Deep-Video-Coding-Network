@@ -90,7 +90,7 @@ def main(args = 1):
     train_images = load_imgs(data_dir, train_start, train_end)
     decoded = coarse.test.predict(train_images, b, training_ratio)
 
-    regrouped_prediction = prediction.inference.predict(decoded, b, bm, training_ratio)
+    regrouped_prediction = prediction.inference.predict(decoded, b, bm, training_ratio, "prediction_gnet2")
     
     residue_train_images = train_images[1:n_train_frames-1]
     residue = residue_train_images - regrouped_prediction

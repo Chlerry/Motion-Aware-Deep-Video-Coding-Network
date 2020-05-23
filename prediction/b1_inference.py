@@ -32,7 +32,7 @@ def pred_inference_b1(decoded, b, bm, ratio):
     
     B = get_block_set(N_frames - 4, decoded, b, bm, 4)
     # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("prediction_b1", ratio)
+    json_path, hdf5_path = get_model_path("prediction", ratio)
 
     # ============== YL: load model ===================
     
