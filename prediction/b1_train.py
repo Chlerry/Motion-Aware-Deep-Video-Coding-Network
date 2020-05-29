@@ -37,7 +37,7 @@ def pred_train(images, decoded, b, bm, ratio):
     
     B = get_block_set(N_frames - 4, decoded, b, bm, 4)
 
-    C = image_to_block(N_frames - 4, images, bm, 2)
+    C = image_to_block(decoded[1:-1], bm)
     # =================================================
 
     input1 = Input(shape = (b, b, 3))

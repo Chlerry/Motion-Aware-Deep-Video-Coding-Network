@@ -42,7 +42,7 @@ def model(images, decoded, b, bm, ratio):
     
     B = get_block_set(N_frames - 2, decoded, b, bm, 2)
     
-    C = image_to_block(N_frames - 2, images, bm, 1)
+    C = image_to_block(decoded[1:-1], bm)
     # ==================================================================================================
 
     input1 = Input(shape = (b, b, 3))
