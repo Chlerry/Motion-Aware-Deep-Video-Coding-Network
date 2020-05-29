@@ -12,6 +12,8 @@ def psnr(img_true, img_recovered):
     return p
 
 def performance_evaluation(images, finalpred, start, step):
+    finalpred = finalpred.astype('uint8')
+
     N_frames = images.shape[0]
     width, height = images.shape[1], images.shape[2]
     pixel_max = 255.0
@@ -20,7 +22,7 @@ def performance_evaluation(images, finalpred, start, step):
     ssims = []
    
     for i in range(start, N_frames, step):
-        img = np.array(images[i].reshape(width*height, 3), dtype = float)
+        img = np.array(images[i].reshape(width*height, 3))
         res = finalpred[i].reshape(width*height, 3)
         m = mean_squared_error(img, res)
         s = ssim(img, res, multichannel=True)
