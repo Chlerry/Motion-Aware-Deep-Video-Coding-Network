@@ -57,25 +57,42 @@ def save_imgs(save_dir, start, finalpred):
         im.save(filename)
         j = j + 1
 
-# Convert image frames to bxb blocks
-# (n_frame, width height, 3) -> (n_block, b*b, 3) -> (n_block, b, b, 3)
-def image_to_block(N_frames, images, b_size, skip):
-    coarse_set = []
-    # for img in images:
-    for i in range(0, N_frames): 
-        img = images[i + skip]
-        #b_size: blk_size
-        for y in range(0, img.shape[0], b_size):
-            for x in range(0, img.shape[1], b_size):
-                block = img[y:y + b_size, x:x + b_size]
-                block = block.reshape(b_size*b_size, 3)
-                coarse_set.append(block)
+# # Convert image frames to bxb blocks
+# # (n_frame, width height, 3) -> (n_block, b*b, 3) -> (n_block, b, b, 3)
+# def image_to_block(N_frames, images, b_size, skip):
+#     coarse_set = []
+#     # for img in images:
+#     for i in range(0, N_frames): 
+#         img = images[i + skip]
+#         #b_size: blk_size
+#         for y in range(0, img.shape[0], b_size):
+#             for x in range(0, img.shape[1], b_size):
+#                 block = img[y:y + b_size, x:x + b_size]
+#                 block = block.reshape(b_size*b_size, 3)
+#                 coarse_set.append(block)
     
-    coarse_set = np.array(coarse_set)
-    # (n_block, b*b, 3) -> (n_block, b, b, 3) # Daniel
-    coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b_size, b_size, 3)
+#     coarse_set = np.array(coarse_set)
+#     # (n_block, b*b, 3) -> (n_block, b, b, 3) # Daniel
+#     coarse_set2 = coarse_set.reshape(coarse_set.shape[0], b_size, b_size, 3)
 
-    return coarse_set2
+#     return coarse_set2
+
+def image_padding(image, pad_size, mode='constant', constant_values=0):
+        npad = ((pad_size, pad_size), (pad_size, pad_size), (0, 0))
+        if mode == 'constant':
+            return np.pad(image, npad, mode, constant_values=constant_values)
+        else:
+            return np.pad(image, npad, mode)
+from skimage.util import view_as_blocks, view_as_windows
+def image_to_block(images, b_size=8, pad_en=False, bm_size = 8):
+    blocks = []
+    for img in images:
+        if not pad_en:
+            blocks.append(view_as_blocks(img, (b_size, b_size, 3)))
+        else:
+            padded_image = image_padding(img, (b_size-bm_size) >> 1)
+            blocks.append(view_as_windows(padded_image, (b_size, b_size, 3), bm_size))
+    return np.asarray(blocks).reshape((-1, b_size, b_size, 3))
 
 # (n_blocks, b, b, 3) -> (n_frames, 480, 832, 3)
 def regroup(N_frames, images_shape, predicted_frames, b_size):

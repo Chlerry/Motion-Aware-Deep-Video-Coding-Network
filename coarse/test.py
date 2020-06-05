@@ -46,7 +46,7 @@ def predict(images, b, ratio):
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
     coarse_model.compile(optimizer=opt, loss='mse', metrics=['acc'])
 
-    coarse_set = image_to_block(images.shape[0], images, b, 0)
+    coarse_set = image_to_block(images, b)
     coarse_frames = coarse_model.predict(coarse_set)
 
     coarse_frames = np.array(coarse_frames)

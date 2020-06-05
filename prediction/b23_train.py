@@ -40,7 +40,7 @@ def pred_train_b23(prev_decoded, predicted_b1_frame, images, b, bm, ratio):
     
     B = get_block_set(N_frames, predicted_b1_frame, b, bm, 0)
 
-    C = image_to_block(N_frames, images, bm, 1)
+    C = image_to_block(decoded[1:-1], bm)
     # =================================================
 
     input1 = Input(shape = (b, b, 3))

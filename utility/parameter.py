@@ -8,8 +8,8 @@ n_train_frames = train_end - train_start
 test_start, test_end = 100, 200
 n_test_frames = test_end - test_start
 
-training_ratio = 8
-testing_ratio =  8
+training_ratio = 6
+testing_ratio =  6
 # ============================== Directories ==============================
 from pathlib import Path
 # Get the absolute directoty (Unix Style) for SPIEcode-Daniel
@@ -59,6 +59,7 @@ def get_training_parameter(model):
         "prediction_gnet3":       1.0,
         "prediction_gnet4":       1.0,
         "prediction_gnet5":       1.0,
+        "prediction_gnet6":       1.0,
         "residue":          1.0,
         "prediction_b1":    1.0,
         "prediction_b23":   1.0,
@@ -75,6 +76,7 @@ def get_training_parameter(model):
         "prediction_gnet3":       100,
         "prediction_gnet4":       100,
         "prediction_gnet5":       100,
+        "prediction_gnet6":       100,
         "residue":          500,
         "prediction_b1":    10000,
         "prediction_b23":   10000,
@@ -91,6 +93,7 @@ def get_training_parameter(model):
         "prediction_gnet3":      128,
         "prediction_gnet4":      128,
         "prediction_gnet5":      128,
+        "prediction_gnet6":      128,
         "residue":          2048,
         "prediction_b1":    128,
         "prediction_b23":   128,
@@ -107,6 +110,7 @@ def get_training_parameter(model):
         "prediction_gnet3":       2000,
         "prediction_gnet4":       2000,
         "prediction_gnet5":       2000,
+        "prediction_gnet6":       2000,
         "residue":          2000,
         "prediction_b1":    10000,
         "prediction_b23":   2000,

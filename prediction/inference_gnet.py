@@ -14,7 +14,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, performance_evaluation, regroup
+from utility.helper import psnr, load_imgs, get_block_set, performance_evaluation, regroup, image_to_block
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -34,13 +34,16 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def predict(decoded, b, bm, ratio, model = "prediction_gnet5"):
+def predict(decoded, b, bm, ratio, model = "prediction_gnet6"):
     
     N_frames = decoded.shape[0]
     # ============== DL ===============================
-    prev = get_block_set(N_frames-2, decoded, b, bm, 0)
+    # prev = get_block_set(N_frames-2, decoded, b, bm, 0)
     
-    B = get_block_set(N_frames-2, decoded, b, bm, 2)
+    # B = get_block_set(N_frames-2, decoded, b, bm, 2)
+    prev = image_to_block(decoded[:-2], b, True)
+
+    B = image_to_block(decoded[2:], b, True)
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path(model, ratio)
     # ============== YL: load model ===================
@@ -68,7 +71,7 @@ def predict(decoded, b, bm, ratio, model = "prediction_gnet5"):
     
 def main(args = 1):   
     
-    b = 16 # blk_size & ref. blk size
+    b = 32 # blk_size & ref. blk size
     bm = 8 # target block size to predict
     
     test_images = load_imgs(data_dir, test_start, test_end)
