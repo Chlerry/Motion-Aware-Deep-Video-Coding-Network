@@ -118,11 +118,11 @@ def regroup(N_frames, images_shape, predicted_frames, b_size):
 
 # get input blocks to prediction model from decoded frames
 # (100, 240, 416, 3) -> (149760, 16, 16, 3)
-def get_block_set(N_frames, decoded, b, bm, skip): 
+def get_block_set(N_frames, decoded, b, bm, step): 
     block_set = []
 
     for i in range(0, N_frames): 
-        img = decoded[i + skip]
+        img = decoded[i + step]
 
         for y in range(0, img.shape[0], bm):
             for x in range(0, img.shape[1], bm):

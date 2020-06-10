@@ -1,7 +1,7 @@
 """
 Created on Wed Feb 12 23:31:07 2020
 
-@author: yingliu
+@author: Dannier Li (Chlerry)
 """
 # Disable INFO and WARNING messages from TensorFlow
 import os
@@ -116,17 +116,16 @@ def model(images, decoded, b, bm, ratio):
     pred_model = Model(inputs = [yc1.input, xc1.input], outputs = z)
     
     pred_model.summary()
-    # ============== DL ===============================
+    # =================================================
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
     pred_model.compile(optimizer=opt, loss='mse')
     
-    # ============== DL ===============================
     json_path, hdf5_path = get_model_path("prediction_gnet5", ratio)
 
     delta, n_patience, batch_size, epoch_size = get_training_parameter("prediction_gnet5")
-    # ============== YL ===============================
+
     # save model and load model:serialize model to JSON
     model_json = pred_model.to_json()
     with open(json_path, "w") as json_file:
