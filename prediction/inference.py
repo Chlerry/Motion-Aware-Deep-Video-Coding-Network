@@ -14,7 +14,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, performance_evaluation, regroup
+from utility.helper import psnr, load_imgs, get_block_set, image_to_block, performance_evaluation, regroup
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -38,9 +38,9 @@ def predict(decoded, b, bm, ratio, model = "prediction"):
     
     N_frames = decoded.shape[0]
     # ============== DL ===============================
-    prev = get_block_set(N_frames-2, decoded, b, bm, 0)
-    
-    B = get_block_set(N_frames-2, decoded, b, bm, 2)
+    prev = image_to_block(decoded[:-2], b, True)
+
+    B = image_to_block(decoded[2:], b, True)
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path(model, ratio)
     # ============== YL: load model ===================
