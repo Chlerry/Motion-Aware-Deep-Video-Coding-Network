@@ -42,7 +42,7 @@ if rtx_optimizer == True:
 def predict(residue, b, ratio): # start
     N_frames = residue.shape[0]
 
-    C = image_to_block(N_frames, residue, b, 0)
+    C = image_to_block(residue, b)
     
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("residue", ratio)
