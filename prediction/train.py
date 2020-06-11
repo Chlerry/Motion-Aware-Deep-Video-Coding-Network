@@ -108,7 +108,7 @@ def main(args = 1):
 
     import coarse.test 
     decoded = coarse.test.predict(train_images, b, training_ratio)
-    model(train_images, decoded, b, bm, training_ratio)
+    model(train_images, train_images, b, bm, training_ratio)
 
 if __name__ == "__main__":   
     import sys
