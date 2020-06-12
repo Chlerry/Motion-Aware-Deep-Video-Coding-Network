@@ -3,11 +3,11 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 import numpy as np
-from keras.layers import Input, Conv2D, Conv2DTranspose
+from keras.layers import Input, Conv2D, Conv2DTranspose, Add
 from keras.models import Model
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 
-from utility.helper import psnr, load_imgs, image_to_block
+from utility.helper import psnr, load_imgs, image_to_block, add_noise
 from utility.parameter import *
 
 # ============== DL ===============================
@@ -30,9 +30,11 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def model(images, b, ratio):
+from keras.layers import Lambda
 
-    coarse_train_set = image_to_block(images.shape[0], images, b, 0)
+def model(images, b, ratio, mode = 'default'):
+
+    coarse_train_set = image_to_block(images, b)
     
     # DL: Load stride and channel from utility.parameter.get_strides_channel
     channel, strides0 = get_channel_strides(ratio)
@@ -43,6 +45,9 @@ def model(images, b, ratio):
     e = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = (1,1), activation='relu')(e)
     e = Conv2D(channel, kernel_size=(5, 5), padding = "SAME", strides = (1,1), activation='relu')(e)
     
+    if(mode == 'noise'):
+        e = Lambda(add_noise)(e)
+
     d = Conv2DTranspose(64, kernel_size=(5, 5), padding = "SAME", strides = (1,1), activation='relu')(e)
     d = Conv2DTranspose(128, kernel_size=(5, 5), padding = "SAME", strides = (1,1), activation='relu')(d)
     d = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(d)
@@ -81,7 +86,7 @@ def main(args = 1):
 
     train_images = load_imgs(data_dir, train_start, train_end) 
     
-    model(train_images, b, training_ratio)
+    model(train_images, b, training_ratio, 'noise')
 
 if __name__ == "__main__":   
     import sys
