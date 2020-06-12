@@ -46,15 +46,14 @@ def model(images, decoded, b, bm, ratio):
 
     input1 = Input(shape = (b, b, 3))
 
-    y = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input1)
     # =================================================
-    y0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
+    y0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input1)
     y0b = Model(inputs = input1, outputs = y0b)
 
-    y0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 1, activation='relu')(y)
+    y0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 2, activation='relu')(input1)
     y0c = Model(inputs = input1, outputs = y0c)
 
-    y0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 1, activation='relu')(y)
+    y0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 2, activation='relu')(input1)
     y0d = Model(inputs = input1, outputs = y0d)
 
     yc0 = keras.layers.concatenate([y0b.output, y0c.output, y0d.output])
@@ -72,20 +71,20 @@ def model(images, decoded, b, bm, ratio):
     # =================================================
     yc1 = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(yc1)
     yc1 = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(yc1)
+    yc1 = Conv2D(256, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(yc1)
     yc1 = Model(inputs = input1, outputs = yc1)
     
     # ==================================================================================================
     input2 = Input(shape = (b, b, 3))
 
-    x = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input2)
     # =================================================
-    x0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
+    x0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input2)
     x0b = Model(inputs = input2, outputs = x0b)
 
-    x0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 1, activation='relu')(x)
+    x0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 2, activation='relu')(input2)
     x0c = Model(inputs = input2, outputs = x0c)
 
-    x0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 1, activation='relu')(x)
+    x0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 2, activation='relu')(input2)
     x0d = Model(inputs = input2, outputs = x0d)
 
     xc0 = keras.layers.concatenate([x0b.output, x0c.output, x0d.output])
@@ -103,13 +102,14 @@ def model(images, decoded, b, bm, ratio):
     # =================================================
     xc1 = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(xc1)
     xc1 = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(xc1)
+    xc1 = Conv2D(256, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(xc1)
     xc1 = Model(inputs = input2, outputs = xc1)
 
     # ==================================================================================================
     c = keras.layers.concatenate([yc1.output, xc1.output])
     
-    z = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(c)
-    z = Conv2D(256, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z)
+    z = Conv2D(256, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(c)
+    z = Conv2D(512, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z)
     z = Conv2D(3, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z)
     
     pred_model = Model(inputs = [yc1.input, xc1.input], outputs = z)
