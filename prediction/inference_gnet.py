@@ -38,9 +38,6 @@ def predict(decoded, b, bm, ratio, model = "prediction_gnet6"):
     
     N_frames = decoded.shape[0]
     # ============== DL ===============================
-    # prev = get_block_set(N_frames-2, decoded, b, bm, 0)
-    
-    # B = get_block_set(N_frames-2, decoded, b, bm, 2)
     prev = image_to_block(decoded[:-2], b, True)
 
     B = image_to_block(decoded[2:], b, True)
