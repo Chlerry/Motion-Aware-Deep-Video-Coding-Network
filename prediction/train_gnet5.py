@@ -46,26 +46,26 @@ def model(images, decoded, b, bm, ratio):
 
     input1 = Input(shape = (b, b, 3))
 
-    y = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input1)
+    y = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(input1)
     # =================================================
-    y0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
+    y0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(y)
     y0b = Model(inputs = input1, outputs = y0b)
 
-    y0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 1, activation='relu')(y)
+    y0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 2, activation='relu')(y)
     y0c = Model(inputs = input1, outputs = y0c)
 
-    y0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 1, activation='relu')(y)
+    y0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 2, activation='relu')(y)
     y0d = Model(inputs = input1, outputs = y0d)
 
     yc0 = keras.layers.concatenate([y0b.output, y0c.output, y0d.output])
     # =================================================
-    y1b = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(yc0)
+    y1b = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(yc0)
     y1b = Model(inputs = input1, outputs = y1b)
 
-    y1c = Conv2D(20, kernel_size=(3, 3), padding = "SAME", strides = 1, activation='relu')(yc0)
+    y1c = Conv2D(20, kernel_size=(3, 3), padding = "SAME", strides = 2, activation='relu')(yc0)
     y1c = Model(inputs = input1, outputs = y1c)
 
-    y1d = Conv2D(4, kernel_size=(1, 1), padding = "SAME", strides = 1, activation='relu')(yc0)
+    y1d = Conv2D(4, kernel_size=(1, 1), padding = "SAME", strides = 2, activation='relu')(yc0)
     y1d = Model(inputs = input1, outputs = y1d)
 
     yc1 = keras.layers.concatenate([y1b.output, y1c.output, y1d.output])
@@ -77,26 +77,26 @@ def model(images, decoded, b, bm, ratio):
     # ==================================================================================================
     input2 = Input(shape = (b, b, 3))
 
-    x = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input2)
+    x = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(input2)
     # =================================================
-    x0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
+    x0b = Conv2D(4, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(x)
     x0b = Model(inputs = input2, outputs = x0b)
 
-    x0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 1, activation='relu')(x)
+    x0c = Conv2D(10, kernel_size=(3, 3), padding = "SAME", strides = 2, activation='relu')(x)
     x0c = Model(inputs = input2, outputs = x0c)
 
-    x0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 1, activation='relu')(x)
+    x0d = Conv2D(2, kernel_size=(1, 1), padding = "SAME", strides = 2, activation='relu')(x)
     x0d = Model(inputs = input2, outputs = x0d)
 
     xc0 = keras.layers.concatenate([x0b.output, x0c.output, x0d.output])
     # =================================================
-    x1b = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(xc0)
+    x1b = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(xc0)
     x1b = Model(inputs = input2, outputs = x1b)
 
-    x1c = Conv2D(20, kernel_size=(3, 3), padding = "SAME", strides = 1, activation='relu')(xc0)
+    x1c = Conv2D(20, kernel_size=(3, 3), padding = "SAME", strides = 2, activation='relu')(xc0)
     x1c = Model(inputs = input2, outputs = x1c)
 
-    x1d = Conv2D(4, kernel_size=(1, 1), padding = "SAME", strides = 1, activation='relu')(xc0)
+    x1d = Conv2D(4, kernel_size=(1, 1), padding = "SAME", strides = 2, activation='relu')(xc0)
     x1d = Model(inputs = input2, outputs = x1d)
 
     xc1 = keras.layers.concatenate([x1b.output, x1c.output, x1d.output])
@@ -145,14 +145,14 @@ def model(images, decoded, b, bm, ratio):
 
 def main(args = 1):  
     
-    b = 16 # blk_size
+    b = 32 # blk_size
     bm = 8 # target block size to predict
 
     train_images = load_imgs(data_dir, train_start, train_end) 
 
     import coarse.test 
-    decoded = coarse.test.predict(train_images, b, training_ratio)
-    model(train_images, decoded, b, bm, training_ratio)
+    # decoded = coarse.test.predict(train_images, b, training_ratio)
+    model(train_images, train_images, b, bm, training_ratio)
 
 if __name__ == "__main__":   
     import sys
