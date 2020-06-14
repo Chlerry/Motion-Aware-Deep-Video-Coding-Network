@@ -38,9 +38,6 @@ def model(images, decoded, b, bm, ratio):
     
     N_frames = images.shape[0]
     # ============== DL ===============================
-    # prev = get_block_set(N_frames - 2, decoded, b, bm, 0)
-    
-    # B = get_block_set(N_frames - 2, decoded, b, bm, 2)
 
     prev = image_to_block(images[:-2], b, True)
 
@@ -171,8 +168,6 @@ def main(args = 1):
 
     train_images = load_imgs(data_dir, train_start, train_end) 
 
-    # import coarse.test 
-    # decoded = coarse.test.predict(train_images, b, training_ratio)
     model(train_images, train_images, b, bm, training_ratio)
 
 if __name__ == "__main__":   

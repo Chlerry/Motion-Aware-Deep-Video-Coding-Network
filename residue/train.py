@@ -38,7 +38,7 @@ if rtx_optimizer == True:
 def model(residue, b, ratio):
     N_frames = residue.shape[0]
     
-    C = image_to_block(N_frames, residue, b, 0)
+    C = image_to_block(residue, b)
 
     # DL: Load stride and channel from utility.parameter.get_strides_channel
     channel, strides0 = get_channel_strides(ratio)

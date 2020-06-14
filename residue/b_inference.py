@@ -38,7 +38,7 @@ def residue_inference(images, pred, b, model, ratio): # start
 
     residue = images - pred
     
-    C = image_to_block(N_frames, residue, b, 0)
+    C = image_to_block(residue, b)
 
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path(model, ratio)
