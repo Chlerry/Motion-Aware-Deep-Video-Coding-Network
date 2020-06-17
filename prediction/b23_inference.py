@@ -3,7 +3,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, regroup, performance_evaluation
+from utility.helper import psnr, load_imgs, regroup, performance_evaluation
 import coarse.test
 from prediction.b1_inference import pred_inference_b1
 

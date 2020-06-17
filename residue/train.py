@@ -2,6 +2,10 @@
 Created on Wed Feb 12 23:31:07 2020
 
 @author: yingliu
+
+Revised on Tue June 16 2020
+
+@author: Dannier LI (Chlerry)
 """
 # Disable INFO and WARNING messages from TensorFlow
 import os
@@ -9,12 +13,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 import keras
 from keras.models import Model
-from keras.layers import Input, Conv2D, Conv2DTranspose
+from keras.layers import Input, Conv2D, Conv2DTranspose, Lambda
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, regroup, image_to_block
+from utility.helper import psnr, load_imgs, regroup, image_to_block, add_noise
 import coarse.test, prediction.inference
 
 # ============== DL ===============================
@@ -35,8 +39,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
       
-def model(residue, b, ratio):
-    N_frames = residue.shape[0]
+def model(residue, b, ratio, mode = 'default'):
     
     C = image_to_block(residue, b)
 
@@ -45,15 +48,18 @@ def model(residue, b, ratio):
 
     input1 = Input(shape = (b, b, 3))
     
-    y = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(input1)
-    y = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(channel, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)  
+    e = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(input1)
+    e = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(e)
+    e = Conv2D(channel, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(e)  
+
+    if(mode == 'noise'):
+        e = Lambda(add_noise)(e)
   
-    y = Conv2DTranspose(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2DTranspose(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(y)
+    d = Conv2DTranspose(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(e)
+    d = Conv2DTranspose(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(d)
+    d = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(d)
     
-    residue_model = Model(inputs = input1, outputs = y)
+    residue_model = Model(inputs = input1, outputs = d)
     
     residue_model.summary()
 
@@ -94,7 +100,7 @@ def main(args = 1):
     
     residue_train_images = train_images[1:n_train_frames-1]
     residue = residue_train_images - regrouped_prediction
-    model(residue, b, training_ratio)
+    model(residue, b, training_ratio, 'noise')
     
 if __name__ == "__main__":   
     import sys
