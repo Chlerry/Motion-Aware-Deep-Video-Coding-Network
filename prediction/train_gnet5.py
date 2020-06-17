@@ -14,7 +14,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, regroup, image_to_block
+from utility.helper import psnr, load_imgs, regroup, image_to_block
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
@@ -37,11 +37,11 @@ if rtx_optimizer == True:
 def model(images, decoded, b, bm, ratio):
     
     # ============== DL ===============================
-    prev = image_to_block(images[:-2], b, True)
+    prev = image_to_block(decoded[:-2], b, True)
 
-    B = image_to_block(images[2:], b, True)
+    B = image_to_block(decoded[2:], b, True)
     
-    C = image_to_block(decoded[1:-1], bm)
+    C = image_to_block(images[1:-1], bm)
     # ==================================================================================================
 
     input1 = Input(shape = (b, b, 3))

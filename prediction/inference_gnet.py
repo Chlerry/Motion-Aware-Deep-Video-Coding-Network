@@ -14,7 +14,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, performance_evaluation, regroup, image_to_block
+from utility.helper import psnr, load_imgs, performance_evaluation, regroup, image_to_block
 
 # ============== DL ===============================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
