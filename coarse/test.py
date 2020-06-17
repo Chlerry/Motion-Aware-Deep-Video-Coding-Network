@@ -49,7 +49,7 @@ def predict(images, b, ratio, mode = 'default'):
     # ==============================================================
     encoder_model = Model(inputs=coarse_model.input,
                                           outputs=coarse_model.get_layer('conv2d_3').output)
-    encoder_model.summary()
+    # encoder_model.summary()
 
     coarse_set = image_to_block(images, b)
     encoded = encoder_model.predict(coarse_set) 
@@ -76,7 +76,7 @@ def predict(images, b, ratio, mode = 'default'):
      
     # create the model
     decoder_model = Model(layer_input, x)
-    decoder_model.summary()
+    # decoder_model.summary()
 
     coarse_frames = decoder_model.predict(encoded)
     # ==============================================================
