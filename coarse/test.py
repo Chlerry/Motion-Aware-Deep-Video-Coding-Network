@@ -30,7 +30,6 @@ def predict(images, b, ratio, mode = 'default'):
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("coarse", ratio)
     # =================================================
-
     json_file = open(json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
@@ -49,34 +48,28 @@ def predict(images, b, ratio, mode = 'default'):
     # ==============================================================
     encoder_model = Model(inputs=coarse_model.input,
                                           outputs=coarse_model.get_layer('conv2d_3').output)
-    encoder_model.summary()
+    # encoder_model.summary()
 
     coarse_set = image_to_block(images, b)
     encoded = encoder_model.predict(coarse_set) 
     import seaborn as sns
     # sns.distplot(encoded.flatten())
     
-    if(mode == 'noise1'):
-        encoded = encoded.astype('uint8')
-        encoded = encoded.astype('float32')
-    elif(mode == 'noise2'):
-        encoded = np.rint(encoded)
+    encoded = np.rint(encoded)
 
     # sns.distplot(encoded.flatten())
     # ==============================================================
     idx = 5 # index of desired layer
-    #input_shape = coarse_model.layers[idx].get_input_shape_at(0) # get the input shape of desired layer
     layer_input = Input(shape=encoded.shape[1:]) # a new input tensor to be able to feed the desired layer
     
     # create the new nodes for each layer in the path
-    
     x = layer_input
     for layer in coarse_model.layers[idx:]:
         x = layer(x)
      
     # create the model
     decoder_model = Model(layer_input, x)
-    decoder_model.summary()
+    # decoder_model.summary()
 
     coarse_frames = decoder_model.predict(encoded)
     # ==============================================================

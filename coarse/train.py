@@ -3,7 +3,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 import numpy as np
-from keras.layers import Input, Conv2D, Conv2DTranspose, Add
+from keras.layers import Input, Conv2D, Conv2DTranspose, Add, Lambda
 from keras.models import Model
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 
@@ -29,8 +29,6 @@ import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
-
-from keras.layers import Lambda
 
 def model(images, b, ratio, mode = 'default'):
 

@@ -9,7 +9,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, regroup, performance_evaluation, image_to_block
+from utility.helper import psnr, load_imgs, regroup, performance_evaluation, image_to_block
 import coarse.test
 from prediction.b1_inference import pred_inference_b1
 from prediction.b23_inference import pred_inference_b23

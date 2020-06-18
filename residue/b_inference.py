@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 import keras
 import numpy as np
-from keras.models import Model
+from keras.models import Model, model_from_json
 from keras.layers import Input, Conv2D
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
@@ -33,38 +33,58 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def residue_inference(images, pred, b, model, ratio): # start
-    N_frames = images.shape[0]
-
-    residue = images - pred
-    
-    C = image_to_block(residue, b)
+def residue_inference(images, pred, b, model, ratio, mode = 'default'): # start
 
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path(model, ratio)
     # =================================================
-    # load residue16 model
-    from keras.models import model_from_json
-
+    # load residue model
     json_file = open(json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
-    residue_model = model_from_json(loaded_model_json)
-    # load weights into new model
+    residue_model = model_from_json(loaded_model_json, custom_objects={'tf': tf})
 
+    # load weights into new model
     residue_model.load_weights(hdf5_path)
     print("Loaded model from " + hdf5_path)
     
-    # ============== DL ===============================
-    # evaluate loaded model on test data
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
     residue_model.compile(optimizer=opt, loss='mse')
+
     # ===================================================
-    residue_decoded = residue_model.predict([C])
+    encoder_model = Model(inputs=residue_model.input,
+                                          outputs=residue_model.get_layer('conv2d_3').output)
+    # encoder_model.summary()
+
+    residue = images - pred
+    residue_set = image_to_block(residue, b)
+    encoded = encoder_model.predict(residue_set) 
+    import seaborn as sns
+    # sns.distplot(encoded.flatten())
+
+    encoded = np.rint(encoded)
+
+    # sns.distplot(encoded.flatten())
+    # ===================================================
+    idx = 5 # index of desired layer
+    layer_input = Input(shape=encoded.shape[1:]) # a new input tensor to be able to feed the desired layer
     
-    final2 = regroup(N_frames, images.shape, residue_decoded, b)
+    # create the new nodes for each layer in the path
+    x = layer_input
+    for layer in residue_model.layers[idx:]:
+        x = layer(x)
+     
+    # create the model
+    decoder_model = Model(layer_input, x)
+    # decoder_model.summary()
+
+    residue_frames = decoder_model.predict(encoded)
+    # ===================================================
+    residue_frames = np.array(residue_frames)
+
+    final2 = regroup(images.shape[0], images.shape, residue_frames, b)
     
     finalpred = np.add(pred, final2)
     
