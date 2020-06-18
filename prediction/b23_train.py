@@ -9,7 +9,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, regroup, image_to_block
+from utility.helper import psnr, load_imgs, regroup, image_to_block
 import coarse.test
 from prediction.b1_inference import pred_inference_b1
 from residue.b_inference import residue_inference
@@ -34,13 +34,12 @@ if rtx_optimizer == True:
 
 def pred_train_b23(prev_decoded, predicted_b1_frame, images, b, bm, ratio):
     
-    N_frames = prev_decoded.shape[0]
     # ============== DL ===============================
-    prev = get_block_set(N_frames, prev_decoded, b, bm, 0)
+    prev = image_to_block(prev_decoded, b, True)
     
-    B = get_block_set(N_frames, predicted_b1_frame, b, bm, 0)
+    B = image_to_block(predicted_b1_frame, b, True)
 
-    C = image_to_block(decoded[1:-1], bm)
+    C = image_to_block(images[1:-1], bm)
     # =================================================
 
     input1 = Input(shape = (b, b, 3))
