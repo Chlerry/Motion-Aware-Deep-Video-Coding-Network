@@ -3,6 +3,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 import numpy as np
+import keras
 from keras.layers import Input, Conv2D, Conv2DTranspose, Add, Lambda
 from keras.models import Model
 from keras.callbacks import ModelCheckpoint, EarlyStopping
@@ -56,7 +57,7 @@ def model(images, b, ratio, mode = 'default'):
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    coarse_model.compile(optimizer=opt, loss='mse') # RK
+    coarse_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError()) # RK
 
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("coarse", ratio)

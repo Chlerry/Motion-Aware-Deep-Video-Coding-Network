@@ -51,7 +51,8 @@ def residue_inference(images, pred, b, model, ratio, mode = 'default'): # start
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    residue_model.compile(optimizer=opt, loss='mse')
+    residue_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
+    # residue_model.summary()
 
     # ===================================================
     encoder_model = Model(inputs=residue_model.input,
@@ -89,6 +90,7 @@ def residue_inference(images, pred, b, model, ratio, mode = 'default'): # start
     finalpred = np.add(pred, final2)
     
     return finalpred
+    # return np.array([])
 ########################################################################
 def main(args = 1):       
     b = 16 # blk_size & ref. blk size
@@ -100,54 +102,54 @@ def main(args = 1):
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, testing_ratio)
     final_predicted_b1 = residue_inference(test_images[2:n_test_frames-2], predicted_b1_frame, b, "residue_b1", testing_ratio)
 
-    predicted_b2_frame = pred_inference_b23(decoded[0:n_test_frames - 4], final_predicted_b1, b, bm, testing_ratio)
-    final_predicted_b2 = residue_inference(test_images[1:n_test_frames-3], predicted_b2_frame, b, "residue_b23", testing_ratio)
+#     predicted_b2_frame = pred_inference_b23(decoded[0:n_test_frames - 4], final_predicted_b1, b, bm, testing_ratio)
+#     final_predicted_b2 = residue_inference(test_images[1:n_test_frames-3], predicted_b2_frame, b, "residue_b23", testing_ratio)
 
-    predicted_b3_frame = pred_inference_b23(decoded[4:n_test_frames], final_predicted_b1, b, bm, testing_ratio)
-    final_predicted_b3 = residue_inference(test_images[3:n_test_frames-1], predicted_b3_frame, b, "residue_b23", testing_ratio)
+#     predicted_b3_frame = pred_inference_b23(decoded[4:n_test_frames], final_predicted_b1, b, bm, testing_ratio)
+#     final_predicted_b3 = residue_inference(test_images[3:n_test_frames-1], predicted_b3_frame, b, "residue_b23", testing_ratio)
 
-#################################### EVALUATION #####################################
-    n_predicted0, amse0, apsnr0, assim0 \
-        = performance_evaluation(test_images, decoded, 0, 4)
-    print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
-    print('n_decoded:',n_predicted0)
-    print('average test coarse_amse:',amse0)
-    print('average test coarse_apsnr:',apsnr0)
-    print('average test coarse_assim:',assim0)
+# #################################### EVALUATION #####################################
+#     n_predicted0, amse0, apsnr0, assim0 \
+#         = performance_evaluation(test_images, decoded, 0, 4)
+#     print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+#     print('n_decoded:',n_predicted0)
+#     print('average test coarse_amse:',amse0)
+#     print('average test coarse_apsnr:',apsnr0)
+#     print('average test coarse_assim:',assim0)
 
-    n_predicted1, amse1, apsnr1, assim1 \
-        = performance_evaluation(test_images[2:n_test_frames-2], final_predicted_b1, 0, 4)
-    print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
-    print('n_b1:',n_predicted1)
-    print('average test b1_amse:',amse1)
-    print('average test b1_apsnr:',apsnr1)
-    print('average test b1_assim:',assim1)
+#     n_predicted1, amse1, apsnr1, assim1 \
+#         = performance_evaluation(test_images[2:n_test_frames-2], final_predicted_b1, 0, 4)
+#     print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+#     print('n_b1:',n_predicted1)
+#     print('average test b1_amse:',amse1)
+#     print('average test b1_apsnr:',apsnr1)
+#     print('average test b1_assim:',assim1)
 
-    n_predicted2, amse2, apsnr2, assim2 \
-        = performance_evaluation(test_images[1:n_test_frames-3], final_predicted_b2, 0, 4)
-    print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
-    print('n_b2:',n_predicted2)
-    print('average test b2_amse:',amse2)
-    print('average test b2_apsnr:',apsnr2)
-    print('average test b2_assim:',assim2)
+#     n_predicted2, amse2, apsnr2, assim2 \
+#         = performance_evaluation(test_images[1:n_test_frames-3], final_predicted_b2, 0, 4)
+#     print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+#     print('n_b2:',n_predicted2)
+#     print('average test b2_amse:',amse2)
+#     print('average test b2_apsnr:',apsnr2)
+#     print('average test b2_assim:',assim2)
 
-    n_predicted3, amse3, apsnr3, assim3 \
-        = performance_evaluation(test_images[3:n_test_frames-1], final_predicted_b3, 0, 4)
-    print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
-    print('n_b3:',n_predicted3)
-    print('average test b3_amse:',amse3)
-    print('average test b3_apsnr:',apsnr3)
-    print('average test b3_assim:',assim3)
+#     n_predicted3, amse3, apsnr3, assim3 \
+#         = performance_evaluation(test_images[3:n_test_frames-1], final_predicted_b3, 0, 4)
+#     print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+#     print('n_b3:',n_predicted3)
+#     print('average test b3_amse:',amse3)
+#     print('average test b3_apsnr:',apsnr3)
+#     print('average test b3_assim:',assim3)
 
-    n_predicted = n_predicted0 + n_predicted1 + n_predicted2 + n_predicted3
-    amse = (amse0*n_predicted0 + amse1*n_predicted1 + amse2*n_predicted2 + amse3*n_predicted3) / n_predicted
-    apsnr = (apsnr0*n_predicted0 + apsnr1*n_predicted1 + apsnr2*n_predicted2 + apsnr3*n_predicted3) / n_predicted
-    assim = (assim0*n_predicted0 + assim1*n_predicted1 + assim2*n_predicted2 + assim3*n_predicted3) / n_predicted
+#     n_predicted = n_predicted0 + n_predicted1 + n_predicted2 + n_predicted3
+#     amse = (amse0*n_predicted0 + amse1*n_predicted1 + amse2*n_predicted2 + amse3*n_predicted3) / n_predicted
+#     apsnr = (apsnr0*n_predicted0 + apsnr1*n_predicted1 + apsnr2*n_predicted2 + apsnr3*n_predicted3) / n_predicted
+#     assim = (assim0*n_predicted0 + assim1*n_predicted1 + assim2*n_predicted2 + assim3*n_predicted3) / n_predicted
 
-    print("vvvvvvvvvvvv Overall vvvvvvvvvvvvv")
-    print('average test final_amse:',amse)
-    print('average test final_apsnr:',apsnr)
-    print('average test final_assim:',assim)
+#     print("vvvvvvvvvvvv Overall vvvvvvvvvvvvv")
+#     print('average test final_amse:',amse)
+#     print('average test final_apsnr:',apsnr)
+#     print('average test final_assim:',assim)
     
 if __name__ == "__main__":   
     import sys

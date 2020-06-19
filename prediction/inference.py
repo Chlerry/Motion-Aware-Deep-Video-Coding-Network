@@ -58,7 +58,7 @@ def predict(decoded, b, bm, ratio, model = "prediction"):
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    pred_model.compile(optimizer=opt, loss='mse', metrics=['acc'])
+    pred_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError(), metrics=['acc'])
 
     predicted_frames = pred_model.predict([prev, B])
 

@@ -9,7 +9,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 import keras
 from keras.models import Model
-from keras.layers import Input, Conv2D
+from keras.layers import Input, Conv2D, BatchNormalization
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
@@ -46,27 +46,27 @@ def model(images, decoded, b, bm, ratio):
 
     input1 = Input(shape = (b, b, 3))
     
-    y = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input1)
-    y = Conv2D(16, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(32, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
+    y = BatchNormalization()(Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input1))
+    y = BatchNormalization()(Conv2D(16, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y))
+    y = BatchNormalization()(Conv2D(32, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y))
+    y = BatchNormalization()(Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y))
+    y = BatchNormalization()(Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y))
     y = Model(inputs = input1, outputs = y)
     
     input2 = Input(shape = (b, b, 3))
     
-    x = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input2)
-    x = Conv2D(16, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
-    x = Conv2D(32, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
-    x = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
-    x = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
+    x = BatchNormalization()(Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input2))
+    x = BatchNormalization()(Conv2D(16, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x))
+    x = BatchNormalization()(Conv2D(32, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x))
+    x = BatchNormalization()(Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x))
+    x = BatchNormalization()(Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x))
     x = Model(inputs = input2, outputs = x)
     
     c = keras.layers.concatenate([y.output, x.output])
     
-    z = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(c)
-    z = Conv2D(256, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z)
-    z = Conv2D(3, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z)
+    z = BatchNormalization()(Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(c))
+    z = BatchNormalization()(Conv2D(256, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z))
+    z = BatchNormalization()(Conv2D(3, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z))
     
     pred_model = Model(inputs = [y.input, x.input], outputs = z)
     pred_model.summary()
@@ -74,7 +74,7 @@ def model(images, decoded, b, bm, ratio):
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    pred_model.compile(optimizer=opt, loss='mse')
+    pred_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
     
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("prediction", ratio)

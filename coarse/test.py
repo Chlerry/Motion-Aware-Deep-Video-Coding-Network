@@ -3,6 +3,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 import numpy as np
+import keras
 from keras.models import model_from_json, Model, Input
 
 from utility.parameter import *
@@ -43,7 +44,7 @@ def predict(images, b, ratio, mode = 'default'):
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    coarse_model.compile(optimizer=opt, loss='mse', metrics=['acc'])
+    coarse_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError(), metrics=['acc'])
 
     # ==============================================================
     encoder_model = Model(inputs=coarse_model.input,
@@ -92,6 +93,10 @@ def main(args = 1):
     print('average test coarse_amse:',coarse_amse)
     print('average test coarse_apsnr:',coarse_apsnr)
     print('average test coarse_assim:',coarse_assim)
+
+    # save_dir = '/home/ridakhan/Desktop/SPIEcode-Daniel/saved/'
+    # save_imgs(save_dir, 0, decoded)
+
 
 if __name__ == "__main__":   
     import sys
