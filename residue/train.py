@@ -13,7 +13,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 import keras
 from keras.models import Model
-from keras.layers import Input, Conv2D, Conv2DTranspose
+from keras.layers import Input, Conv2D, Conv2DTranspose, Lambda
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
@@ -100,7 +100,7 @@ def main(args = 1):
     
     residue_train_images = train_images[1:n_train_frames-1]
     residue = residue_train_images - regrouped_prediction
-    model(residue, b, training_ratio)
+    model(residue, b, training_ratio, 'noise')
     
 if __name__ == "__main__":   
     import sys

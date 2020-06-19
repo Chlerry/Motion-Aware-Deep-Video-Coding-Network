@@ -8,8 +8,8 @@ n_train_frames = train_end - train_start
 test_start, test_end = 100, 200
 n_test_frames = test_end - test_start
 
-training_ratio = 6
-testing_ratio =  6
+training_ratio = 8
+testing_ratio =  8
 # ============================== Directories ==============================
 from pathlib import Path
 # Get the absolute directoty (Unix Style) for SPIEcode-Daniel
