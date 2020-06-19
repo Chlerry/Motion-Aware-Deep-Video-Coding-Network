@@ -3,7 +3,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, get_block_set, regroup, save_imgs, performance_evaluation
+from utility.helper import psnr, load_imgs, regroup, save_imgs, performance_evaluation, image_to_block
 import coarse.test 
 
 # ============== DL ===============================
@@ -28,9 +28,9 @@ def pred_inference_b1(decoded, b, bm, ratio):
     
     N_frames = decoded.shape[0]
     # ============== DL ===============================
-    prev = get_block_set(N_frames - 4, decoded, b, bm, 0)
-    
-    B = get_block_set(N_frames - 4, decoded, b, bm, 4)
+    prev = image_to_block(decoded[:-4], b, True)
+
+    B = image_to_block(decoded[4:], b, True)
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("prediction", ratio)
 
