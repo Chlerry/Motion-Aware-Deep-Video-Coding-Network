@@ -37,11 +37,11 @@ if rtx_optimizer == True:
 def model(images, decoded, b, bm, ratio):
     
     # ============== DL ===============================
-    prev = image_to_block(images[:-2], b, True)
+    prev = image_to_block(decoded[:-2], b, True)
 
-    B = image_to_block(images[2:], b, True)
+    B = image_to_block(decoded[2:], b, True)
     
-    C = image_to_block(decoded[1:-1], bm)
+    C = image_to_block(images[1:-1], bm)
     # =================================================
 
     input1 = Input(shape = (b, b, 3))

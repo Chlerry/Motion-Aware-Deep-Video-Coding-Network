@@ -3,7 +3,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, regroup, save_imgs, performance_evaluation
+from utility.helper import psnr, load_imgs, regroup, save_imgs, performance_evaluation, image_to_block
 import coarse.test 
 
 # ============== DL ===============================

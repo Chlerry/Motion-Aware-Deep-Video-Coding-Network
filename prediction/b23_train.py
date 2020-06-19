@@ -34,13 +34,12 @@ if rtx_optimizer == True:
 
 def pred_train_b23(prev_decoded, predicted_b1_frame, images, b, bm, ratio):
     
-    N_frames = prev_decoded.shape[0]
     # ============== DL ===============================
-    prev = get_block_set(N_frames, prev_decoded, b, bm, 0)
+    prev = image_to_block(prev_decoded, b, True)
     
-    B = get_block_set(N_frames, predicted_b1_frame, b, bm, 0)
+    B = image_to_block(predicted_b1_frame, b, True)
 
-    C = image_to_block(decoded[1:-1], bm)
+    C = image_to_block(images[1:-1], bm)
     # =================================================
 
     input1 = Input(shape = (b, b, 3))

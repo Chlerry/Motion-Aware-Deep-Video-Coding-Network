@@ -29,10 +29,9 @@ def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio):
     
     N_frames = prev_decoded.shape[0]
     # ============== DL ===============================
-    prev = get_block_set(N_frames, prev_decoded, b, bm, 0)
-    # print(prev.shape)
+    prev = image_to_block(prev_decoded, b, True)
     
-    B = get_block_set(N_frames, predicted_b1_frame, b, bm, 0)
+    B = image_to_block(predicted_b1_frame, b, True)
     # print(B.shape)
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("prediction_b23", ratio)

@@ -31,13 +31,12 @@ if rtx_optimizer == True:
 # =================================================
 
 def pred_train(images, decoded, b, bm, ratio):
-    N_frames = images.shape[0]
     # ============== DL ===============================
-    prev = get_block_set(N_frames - 4, decoded, b, bm, 0)
-    
-    B = get_block_set(N_frames - 4, decoded, b, bm, 4)
+    prev = image_to_block(decoded[:-4], b, True)
 
-    C = image_to_block(decoded[1:-1], bm)
+    B = image_to_block(decoded[4:], b, True)
+
+    C = image_to_block(images[1:-1], bm)
     # =================================================
 
     input1 = Input(shape = (b, b, 3))
