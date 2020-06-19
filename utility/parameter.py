@@ -1,5 +1,5 @@
 # Set rtx_optimizer to turn on RTX 16bits float optimization
-rtx_optimizer = False
+rtx_optimizer = True
 
 # =========================================================================
 train_start, train_end = 0, 100
@@ -60,6 +60,7 @@ def get_training_parameter(model):
         "prediction_gnet4":       1.0,
         "prediction_gnet5":       1.0,
         "prediction_gnet6":       1.0,
+        "prediction_gnet8":       1.0,
         "residue":          1.0,
         "prediction_b1":    1.0,
         "prediction_b23":   1.0,
@@ -77,6 +78,7 @@ def get_training_parameter(model):
         "prediction_gnet4":       100,
         "prediction_gnet5":       100,
         "prediction_gnet6":       100,
+        "prediction_gnet8":       100,
         "residue":          500,
         "prediction_b1":    10000,
         "prediction_b23":   10000,
@@ -94,6 +96,7 @@ def get_training_parameter(model):
         "prediction_gnet4":      128,
         "prediction_gnet5":      128,
         "prediction_gnet6":      128,
+        "prediction_gnet8":      64,
         "residue":          2048,
         "prediction_b1":    128,
         "prediction_b23":   128,
@@ -111,6 +114,7 @@ def get_training_parameter(model):
         "prediction_gnet4":       2000,
         "prediction_gnet5":       2000,
         "prediction_gnet6":       2000,
+        "prediction_gnet8":       2000,
         "residue":          2000,
         "prediction_b1":    10000,
         "prediction_b23":   2000,
