@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 import keras
 from keras.models import Model
-from keras.layers import Input, Conv2D, Conv2DTranspose
+from keras.layers import Input, Conv2D, Conv2DTranspose, Lambda
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
