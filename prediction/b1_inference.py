@@ -2,6 +2,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
+import keras
 from utility.parameter import *
 from utility.helper import psnr, load_imgs, regroup, save_imgs, performance_evaluation, image_to_block
 import coarse.test 
@@ -24,7 +25,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def pred_inference_b1(decoded, b, bm, ratio):
+def pred_inference_b1(decoded, b, bm, ratio, model = "prediction"):
     
     N_frames = decoded.shape[0]
     # ============== DL ===============================
@@ -32,7 +33,7 @@ def pred_inference_b1(decoded, b, bm, ratio):
 
     B = image_to_block(decoded[4:], b, True)
     # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("prediction", ratio)
+    json_path, hdf5_path = get_model_path(model, ratio)
 
     # ============== YL: load model ===================
     
@@ -50,7 +51,7 @@ def pred_inference_b1(decoded, b, bm, ratio):
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    pred_model.compile(optimizer=opt, loss='mse', metrics=['acc'])
+    pred_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError(), metrics=['acc'])
     # ===================================================
 
     predicted_frames = pred_model.predict([prev, B])

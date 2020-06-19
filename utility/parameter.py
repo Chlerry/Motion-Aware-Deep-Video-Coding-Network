@@ -1,5 +1,5 @@
 # Set rtx_optimizer to turn on RTX 16bits float optimization
-rtx_optimizer = False
+rtx_optimizer = True
 
 # =========================================================================
 train_start, train_end = 0, 100

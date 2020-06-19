@@ -69,7 +69,7 @@ def pred_train(images, decoded, b, bm, ratio):
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    pred_model.compile(optimizer=opt, loss='mse')
+    pred_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("prediction_b1", ratio)
     delta, n_patience, batch_size, epoch_size = get_training_parameter("prediction_b1")
