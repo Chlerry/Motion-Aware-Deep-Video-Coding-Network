@@ -29,7 +29,8 @@ Refactored and updated by **Dannier Li**
     |   ├── b1_train.py
     |   ├── b1_inference.py
     |   ├── b23_train.py
-    |   └── b23_inference.py
+    |   ├── b23_inference.py
+    |   └── train_gnet5_new.py
     ├── residue
     |   ├── __init__.py 
     |   ├── train.py
@@ -47,7 +48,7 @@ Refactored and updated by **Dannier Li**
 
 ## Setup Environment 
 The project is developed on `Windows 10.19041` with `conda 4.8.3`. Code could be running in both `Anaconda PowerShell` and `Spyder 4`.  
-Package dependencies should be installed in `Anaconda` with following command lines in `PowerShell` (Open `PowerShell` as **Administrator** if you are using `Windows 10`).  
+Package dependencies should be installed in `Anaconda` with following command lines in `Ubuntu Terminal` or `PowerShell` (Open `PowerShell` as **Administrator** if you are using `Windows 10`).  
 > conda install -c anaconda tensorflow-gpu  
 > conda install -c conda-forge keras  
 > conda install -c conda-forge scikit-learn  
@@ -68,44 +69,54 @@ All training and testing parameters can be found and changed in `utility/paramet
 - Set the working directory to `SPIEcode-Daniel`
 - Open and run `./__main__.py` with `python` in `Powershell`
 - Uncomment the following code to train **original** model
-    > \# Train compression net  
-    > coarse.train.main()  
-    > 
-    > \# Train prediction net  
-    > prediction.train.main()  
-    > 
-    > \# Train residue net  
-    > residue.train.main()  
+    - Train compression net  
+        > coarse.train.main()  
+    - Train prediction net  
+        > prediction.train.main()  
+    - Train residue net  
+        > residue.train.main()  
 - Uncomment the following code to test **original** model
-    > \# Test compression net  
-    > coarse.test.main()  
-    > 
-    > \# Test prediction net  
-    > prediction.inference.main()
-    >   
-    > \# Test residue net  
-    > residue.inference.main()  
+    - Test compression net  
+        > coarse.test.main()  
+    - Test prediction net  
+        > prediction.inference.main()
+    - Test residue net  
+        > residue.inference.main()  
 - Uncomment the following code to train **new** model
-    > \# Train b1's prediction net  
-    > prediction.b1_train.main()  
-    > 
-    > \# Train b1's residue net  
-    > residue.b1_train.main()
-    > 
-    > \# Train b2 and b3's prediction net  
-    > prediction.b23_train.main()  
-    > 
-    > \# Train b2 and b3's residue net   
-    > residue.b23_train.main()
-- Uncomment the following code to test **new** model
-    > \# Test b1's prediction net  
-    > prediction.b1_inference.main()  
-    > 
-    > \# Test b2 and b3's prediction net  
-    > prediction.b23_inference.main()  
-    >
-    > \# Test b1, b2 and b3's residue net  
-    > residue.b_inference.main()
+    - Train b1's prediction net  
+        > prediction.b1_train.main()  
+    - Train b1's residue net  
+        > residue.b1_train.main()
+    - Train b2 and b3's prediction net  
+        > prediction.b23_train.main()  
+    - Train b2 and b3's residue net   
+        > residue.b23_train.main()
+- Uncomment the following code to test **new** model  
+    - Test b1's prediction net  
+        > prediction.b1_inference.main()  
+    - Test b2 and b3's prediction net  
+        > prediction.b23_inference.main()  
+    - Test b1, b2 and b3's residue net  
+        > residue.b_inference.main()
+- Uncomment the following code to train  **GNet5** model
+    - Train b and b1's prediction net  
+        > prediction.train_gnet5_new.main()  
+- Test b's **GNet5** model  
+  I would strong recommend using jupyter notebook or command line to run the code instead of the following. Anyway, if you are still using Spider:
+    First, please update `prediction.inference.main()`: 
+    > `--` regrouped_prediction = predict(decoded, b, bm, testing_ratio)  
+    > `++` regrouped_prediction = predict(decoded, b, bm, testing_ratio, 'prediction_gnet5')  
+    >  
+  Then uncomment the following line  
+    > prediction.inference.main()  
+
+- Test b1's **GNet5** prediction 
+  First, please first update `prediction.b1_inference.main()`:  
+    > `--` predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)  
+    > `++` predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio, 'prediction_gnet5')  
+    >  
+  Then uncomment the following line  
+    > prediction.b1_inference.main()
 
 
 ## Running with PowerShell or Jupyter Notebook 
