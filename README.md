@@ -83,8 +83,9 @@ All training and testing parameters can be found and changed in `utility/paramet
     - Test residue net  
         > residue.inference.main()  
 - Uncomment the following code to train **new** model
-    - Train b1's prediction net  
-        > prediction.b1_train.main()  
+    - Train b1's prediction net (Since currently we are using b model to predict b1 frames, the training code remains the same as b prediction) 
+        > ~~prediction.b1_train.main()~~  
+        >   prediction.train.main()  
     - Train b1's residue net  
         > residue.b1_train.main()
     - Train b2 and b3's prediction net  
