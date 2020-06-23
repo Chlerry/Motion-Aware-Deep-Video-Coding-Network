@@ -31,7 +31,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
       
-def residue_train(residue, b, ratio, mode = 'default'):
+def residue_train(residue, b, ratio, model = "residue_b1", mode = 'noise'):
 
     C = image_to_block(residue, b)
     
@@ -59,8 +59,8 @@ def residue_train(residue, b, ratio, mode = 'default'):
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
     residue_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
     # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("residue_b1", ratio)
-    delta, n_patience, batch_size, epoch_size = get_training_parameter("residue_b1")
+    json_path, hdf5_path = get_model_path(model, ratio)
+    delta, n_patience, batch_size, epoch_size = get_training_parameter(model)
 
     # ============== YL ===============================
     # save model
@@ -91,7 +91,7 @@ def main(args = 1):
 
     residue = train_images[2:n_train_frames - 2] - predicted_b1_frame
 
-    residue_train(residue, b, training_ratio, 'noise')
+    residue_train(residue, b, training_ratio, "residue_b1")
     
 if __name__ == "__main__":   
     import sys

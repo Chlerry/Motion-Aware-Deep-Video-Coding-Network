@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
 import keras
 from keras.models import Model
-from keras.layers import Input, Conv2D, Conv2DTranspose
+from keras.layers import Input, Conv2D, Conv2DTranspose, Lambda
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
@@ -32,56 +32,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
       
-def residue_train(images, predicted_b1_frame, bm, b, ratio):
-    N_frames = images.shape[0]
-    
-    residue = images - predicted_b1_frame
-    
-    C = image_to_block(residue, b)
-    
-    # DL: Load stride and channel from utility.parameter.get_strides_channel
-    channel, strides0 = get_channel_strides(ratio)
-
-    input1 = Input(shape = (b, b, 3))
-    
-    y = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(input1)
-    y = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(channel, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)  
-  
-    y = Conv2DTranspose(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2DTranspose(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(y)
-    
-    residue_model = Model(inputs = input1, outputs = y)
-    
-    residue_model.summary()
-    # ============== DL ===============================
-    # evaluate loaded model on test data
-    opt = tf.keras.optimizers.Adam()
-    if rtx_optimizer == True:
-        opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    residue_model.compile(optimizer=opt, loss='mse')
-    # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("residue_b23", ratio)
-    delta, n_patience, batch_size, epoch_size = get_training_parameter("residue_b23")
-
-    # ============== YL ===============================
-    # save model
-    model_json = residue_model.to_json()
-    with open(json_path, "w") as json_file:
-        json_file.write(model_json)
-    
-    # define early stopping callback
-    earlystop = EarlyStopping(monitor='val_loss', min_delta=delta, \
-                              patience=n_patience, \
-                              verbose=2, mode='auto', \
-                              baseline=None, restore_best_weights=True)                    
-    # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath=hdf5_path,\
-                                   monitor='val_loss',save_best_only=True)
-    callbacks_list = [earlystop, checkpointer]
-    residue_model.fit(C, C, batch_size=batch_size, \
-        epochs=epoch_size, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+from residue.b1_train import residue_train
     
 def main(args = 1): 
     
@@ -96,12 +47,13 @@ def main(args = 1):
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
     from residue.b_inference import residue_inference
     final_predicted_b1 = residue_inference( \
-        train_images[2:n_train_frames-2], predicted_b1_frame, b, "residue_b1", training_ratio)
+        train_images[2:-2], predicted_b1_frame, b, "residue_b1", training_ratio)
 
     predicted_b2_frame = pred_inference_b23( \
-        decoded[0:n_train_frames - 4], final_predicted_b1, b, bm, training_ratio)
+        decoded[:-4], final_predicted_b1, b, bm, training_ratio)
 
-    residue_train(train_images[1:n_train_frames - 3], predicted_b2_frame, bm, b, training_ratio)
+    residue = train_images[1:-3] - predicted_b2_frame
+    residue_train(residue, b, training_ratio, "residue_b23")
     
 if __name__ == "__main__":   
     import sys

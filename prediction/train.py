@@ -34,7 +34,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def model(images, decoded, b, bm, ratio):
+def model(images, decoded, b, bm, ratio, model = "prediction"):
     
     # ============== DL ===============================
     prev = image_to_block(decoded[:-2], b, True)
@@ -77,9 +77,9 @@ def model(images, decoded, b, bm, ratio):
     pred_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
     
     # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("prediction", ratio)
+    json_path, hdf5_path = get_model_path(model, ratio)
 
-    delta, n_patience, batch_size, epoch_size = get_training_parameter("prediction")
+    delta, n_patience, batch_size, epoch_size = get_training_parameter(model)
     # ============== YL ===============================
     # save model and load model:serialize model to JSON
     model_json = pred_model.to_json()

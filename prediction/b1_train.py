@@ -30,80 +30,15 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def pred_train(images, decoded, b, bm, ratio):
-    # ============== DL ===============================
-    prev = image_to_block(decoded[:-4], b, True)
-
-    B = image_to_block(decoded[4:], b, True)
-
-    C = image_to_block(images[1:-1], bm)
-    # =================================================
-
-    input1 = Input(shape = (b, b, 3))
-    
-    y = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input1)
-    y = Conv2D(16, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(32, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Model(inputs = input1, outputs = y)
-    
-    input2 = Input(shape = (b, b, 3))
-    
-    x = Conv2D(8, kernel_size=(5, 5), padding = "SAME", strides = 2, activation='relu')(input2)
-    x = Conv2D(16, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
-    x = Conv2D(32, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
-    x = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
-    x = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(x)
-    x = Model(inputs = input2, outputs = x)
-    
-    c = keras.layers.concatenate([y.output, x.output])
-    
-    z = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(c)
-    z = Conv2D(256, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z)
-    z = Conv2D(3, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(z)
-    
-    pred_model = Model(inputs = [y.input, x.input], outputs = z)
-    pred_model.summary()
-    # ============== DL ===============================
-    opt = tf.keras.optimizers.Adam()
-    if rtx_optimizer == True:
-        opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    pred_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
-    # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("prediction_b1", ratio)
-    delta, n_patience, batch_size, epoch_size = get_training_parameter("prediction_b1")
-
-    # ============== YL ===============================
-    # save model and load model
-    # serialize model to JSON
-    model_json = pred_model.to_json()
-    with open(json_path, "w") as json_file:
-        json_file.write(model_json)
-
-    
-    # define early stopping callback
-    earlystop = EarlyStopping(monitor='val_loss', min_delta = delta, \
-                              patience = n_patience, \
-                              verbose=2, mode='auto', \
-                              baseline=None, restore_best_weights=True)                    
-    # define modelcheckpoint callback
-    checkpointer = ModelCheckpoint(filepath=hdf5_path,\
-                                   monitor='val_loss',save_best_only=True)
-    callbacks_list = [earlystop, checkpointer]
-    pred_model.fit([prev, B], C, batch_size = batch_size, \
-        epochs=epoch_size, verbose=2, validation_split=0.2, callbacks=callbacks_list)
-    # ===================================================
-
+from prediction.train import model
     
 def main(args = 1):   
     b = 16 # blk_size & ref. blk size
     bm = 8 # target block size to predict
     
     train_images = load_imgs(data_dir, train_start, train_end)
-    decoded = coarse.test.predict(train_images, b, training_ratio) # (n_blocks, 16, 16, 3)
 
-    pred_train(train_images, decoded, b, bm, training_ratio)
+    model(train_images, train_images, b, bm, training_ratio)
 
 if __name__ == "__main__":   
     import sys
