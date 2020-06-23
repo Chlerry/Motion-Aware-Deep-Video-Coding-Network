@@ -52,70 +52,54 @@ def get_model_path(model, ratio):
 def get_training_parameter(model):
 
     delta_switcher = {
-        "coarse":           1.0,
-        "prediction":       1.0,
-        "prediction_gnet":        1.0,
-        "prediction_gnet2":       1.0,
-        "prediction_gnet3":       1.0,
-        "prediction_gnet4":       1.0,
-        "prediction_gnet5":       1.0,
-        "prediction_gnet6":       1.0,
-        "residue":          1.0,
-        "prediction_b1":    1.0,
-        "prediction_b23":   1.0,
-        "residue_b1":       1.0,
-        "residue_b23":      1.0
+        "coarse":               1.0,
+        "prediction":           1.0,
+        "prediction_gnet5":     1.0,
+        "prediction_b23_gnet5": 1.0,
+        "residue":              1.0,
+        "prediction_b1":        1.0,
+        "prediction_b23":       1.0,
+        "residue_b1":           1.0,
+        "residue_b23":          1.0
     }
     delta = delta_switcher.get(model, "Invalid Model")
 
     patience_switcher = {
-        "coarse":           500,
-        "prediction":       100,
-        "prediction_gnet":        100,
-        "prediction_gnet2":       100,
-        "prediction_gnet3":       100,
-        "prediction_gnet4":       100,
-        "prediction_gnet5":       100,
-        "prediction_gnet6":       100,
-        "residue":          500,
-        "prediction_b1":    10000,
-        "prediction_b23":   10000,
-        "residue_b1":       2000,
-        "residue_b23":      500
+        "coarse":               500,
+        "prediction":           100,
+        "prediction_gnet5":     100,
+        "prediction_b23_gnet5": 100,
+        "residue":              2000,
+        "prediction_b1":        500,
+        "prediction_b23":       500,
+        "residue_b1":           2000,
+        "residue_b23":          2000
     }
     n_patience = patience_switcher.get(model, "Invalid Model");
 
     batch_switcher = {
-        "coarse":           256,
-        "prediction":       128,
-        "prediction_gnet":       128,
-        "prediction_gnet2":      128,
-        "prediction_gnet3":      128,
-        "prediction_gnet4":      128,
-        "prediction_gnet5":      128,
-        "prediction_gnet6":      128,
-        "residue":          2048,
-        "prediction_b1":    128,
-        "prediction_b23":   128,
-        "residue_b1":       512,
-        "residue_b23":      512
+        "coarse":               256,
+        "prediction":           128,
+        "prediction_gnet5":     128,
+        "prediction_b23_gnet5": 128,
+        "residue":              2048,
+        "prediction_b1":        128,
+        "prediction_b23":       128,
+        "residue_b1":           512,
+        "residue_b23":          512
     }
     batch_size = batch_switcher.get(model, "Invalid Model")
 
     epoch_switcher = {
-        "coarse":           2000,
-        "prediction":       2000,
-        "prediction_gnet":        2000,
-        "prediction_gnet2":       2000,
-        "prediction_gnet3":       2000,
-        "prediction_gnet4":       2000,
-        "prediction_gnet5":       2000,
-        "prediction_gnet6":       2000,
-        "residue":          2000,
-        "prediction_b1":    10000,
-        "prediction_b23":   2000,
-        "residue_b1":       2000,
-        "residue_b23":      2000
+        "coarse":               2000,
+        "prediction":           2000,
+        "prediction_gnet5":     2000,
+        "prediction_b23_gnet5": 2000,
+        "residue":              2000,
+        "prediction_b1":        2000,
+        "prediction_b23":       2000,
+        "residue_b1":           2000,
+        "residue_b23":          2000
     }
     epoch_size = epoch_switcher.get(model, "Invalid Model")
     # epoch_size = 1
