@@ -2,8 +2,9 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 
+import keras
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, regroup, performance_evaluation
+from utility.helper import psnr, load_imgs, regroup, performance_evaluation, image_to_block
 import coarse.test
 from prediction.b1_inference import pred_inference_b1
 
@@ -25,7 +26,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio):
+def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio, model = "prediction_b23"):
     
     N_frames = prev_decoded.shape[0]
     # ============== DL ===============================
@@ -34,7 +35,7 @@ def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio):
     B = image_to_block(predicted_b1_frame, b, True)
     # print(B.shape)
     # ============== DL ===============================
-    json_path, hdf5_path = get_model_path("prediction_b23", ratio)
+    json_path, hdf5_path = get_model_path(model, ratio)
     
     # ============== YL: load model ===============================
     
@@ -52,11 +53,11 @@ def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio):
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    pred_model.compile(optimizer=opt, loss='mse', metrics=['acc'])
+    pred_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError(), metrics=['acc'])
 
     predicted_b23 = pred_model.predict([prev, B])
 
-    predicted_b23_frame = regroup(n_test_frames - 4, prev_decoded.shape, predicted_b23, bm)
+    predicted_b23_frame = regroup(N_frames, prev_decoded.shape, predicted_b23, bm)
     return predicted_b23_frame
     # ===================================================
     
@@ -70,12 +71,15 @@ def main(args = 1):
 
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, testing_ratio)
     from residue.b_inference import residue_inference
-    final_predicted_b1 = residue_inference(test_images[2:n_test_frames-2], predicted_b1_frame, b, "residue_b1", testing_ratio)
+    final_predicted_b1 = residue_inference(test_images[2:-2], predicted_b1_frame, b, "residue_b1", testing_ratio)
 
-    predicted_b2_frame = pred_inference_b23(decoded[0:n_test_frames - 4], final_predicted_b1, b, bm, testing_ratio)
+    predicted_b2_frame = pred_inference_b23(decoded[:-4], final_predicted_b1, b, bm, testing_ratio, "prediction_b23")
+    print(decoded[:-4].shape)
+    print(final_predicted_b1.shape)
+    print(predicted_b2_frame.shape)
 
     n_predicted2, amse2, apsnr2, assim2 \
-        = performance_evaluation(test_images[1:n_test_frames-3], predicted_b2_frame, 0, 4)
+        = performance_evaluation(test_images[1:-3], predicted_b2_frame, 0, 1)
     print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
     print('n_b2:',n_predicted2)
     print('average test b2_amse:',amse2)

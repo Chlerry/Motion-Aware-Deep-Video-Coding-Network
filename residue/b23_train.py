@@ -9,7 +9,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 
 from utility.parameter import *
-from utility.helper import psnr, load_imgs, regroup, performance_evaluation, image_to_block
+from utility.helper import psnr, load_imgs, regroup, image_to_block, add_noise
 import coarse.test
 from prediction.b1_inference import pred_inference_b1
 from prediction.b23_inference import pred_inference_b23
@@ -33,10 +33,6 @@ if rtx_optimizer == True:
 # =================================================
       
 def residue_train(images, predicted_b1_frame, bm, b, ratio):
-    N_frames = images.shape[0]
-    
-    residue = images - predicted_b1_frame
-    
     C = image_to_block(residue, b)
     
     # DL: Load stride and channel from utility.parameter.get_strides_channel
@@ -44,23 +40,24 @@ def residue_train(images, predicted_b1_frame, bm, b, ratio):
 
     input1 = Input(shape = (b, b, 3))
     
-    y = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(input1)
-    y = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2D(channel, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)  
+    e = Conv2D(128, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(input1)
+    e = Conv2D(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(e)
+    e = Conv2D(channel, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(e)  
+
+    if(mode == 'noise'):
+        e = Lambda(add_noise)(e)
   
-    y = Conv2DTranspose(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2DTranspose(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(y)
-    y = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(y)
+    d = Conv2DTranspose(64, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(e)
+    d = Conv2DTranspose(128, kernel_size=(5, 5), padding = "SAME", strides = 1, activation='relu')(d)
+    d = Conv2DTranspose(3, kernel_size=(5, 5), padding = "SAME", strides = strides0, activation='relu')(d)
     
-    residue_model = Model(inputs = input1, outputs = y)
-    
+    residue_model = Model(inputs = input1, outputs = d)    
     residue_model.summary()
-    # ============== DL ===============================
-    # evaluate loaded model on test data
+
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    residue_model.compile(optimizer=opt, loss='mse')
+    residue_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
     # ============== DL ===============================
     json_path, hdf5_path = get_model_path("residue_b23", ratio)
     delta, n_patience, batch_size, epoch_size = get_training_parameter("residue_b23")
@@ -70,7 +67,7 @@ def residue_train(images, predicted_b1_frame, bm, b, ratio):
     model_json = residue_model.to_json()
     with open(json_path, "w") as json_file:
         json_file.write(model_json)
-    
+
     # define early stopping callback
     earlystop = EarlyStopping(monitor='val_loss', min_delta=delta, \
                               patience=n_patience, \
@@ -80,8 +77,8 @@ def residue_train(images, predicted_b1_frame, bm, b, ratio):
     checkpointer = ModelCheckpoint(filepath=hdf5_path,\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
-    residue_model.fit(C, C, batch_size=batch_size, \
-        epochs=epoch_size, verbose=2, validation_split=0.2, callbacks=callbacks_list)
+    residue_model.fit(C, C, batch_size=batch_size, epochs=epoch_size, \
+        verbose=2, validation_split=0.2, callbacks=callbacks_list)
     
 def main(args = 1): 
     
@@ -96,12 +93,12 @@ def main(args = 1):
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
     from residue.b_inference import residue_inference
     final_predicted_b1 = residue_inference( \
-        train_images[2:n_train_frames-2], predicted_b1_frame, b, "residue_b1", training_ratio)
+        train_images[2:-2], predicted_b1_frame, b, "residue_b1", training_ratio)
 
     predicted_b2_frame = pred_inference_b23( \
-        decoded[0:n_train_frames - 4], final_predicted_b1, b, bm, training_ratio)
+        decoded[:-4], final_predicted_b1, b, bm, training_ratio)
 
-    residue_train(train_images[1:n_train_frames - 3], predicted_b2_frame, bm, b, training_ratio)
+    residue_train(train_images[1:-3], predicted_b2_frame, bm, b, training_ratio)
     
 if __name__ == "__main__":   
     import sys
