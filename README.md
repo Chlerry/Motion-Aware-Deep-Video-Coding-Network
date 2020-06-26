@@ -1,6 +1,14 @@
 # Motion-Aware Deep Video Coding Network
-Originally implemented by **Rida Khan** and **Ying Liu**  
-Refactored and updated by **Dannier Li**  
+
+Refactored and updated by **Dannier Li (Chlerry)** for further research between *03/20/2020* and *06/26/2020*
+
+Initially created by **Ying Liu** on *02/12/2020*
+
+**Paper Reference:**  
+R. Khan, Y. Liu, "Motion-aware deep video coding network," Proceedings Volume 11395, *Big Data II: Learning, Analytics, and Applications*; 113950B (2020) [https://doi.org/10.1117/12.2560814](https://www.spiedigitallibrary.org/conference-proceedings-of-spie/11395.toc)  
+Event: SPIE Defense + Commercial Sensing, 2020, Online Only
+
+
 ***Santa Clara University, Santa Clara, CA***  
 
 ## File Structure
@@ -46,8 +54,8 @@ Refactored and updated by **Dannier Li**
     └── README.md
 ```
 
-## Setup Environment 
-The project is developed on `Windows 10.19041` with `conda 4.8.3`. Code could be running in both `Anaconda PowerShell` and `Spyder 4`.  
+## Environment Setup  
+The project is developed on `Windows 10.19041` and `Ubuntu 18.04` with `conda 4.8.3`. Code could be running on `Anaconda PowerShell`, `Ubuntu` and `Spyder 4`.  
 Package dependencies should be installed in `Anaconda` with following command lines in `Ubuntu Terminal` or `PowerShell` (Open `PowerShell` as **Administrator** if you are using `Windows 10`).  
 > conda install -c anaconda tensorflow-gpu  
 > conda install -c conda-forge keras  

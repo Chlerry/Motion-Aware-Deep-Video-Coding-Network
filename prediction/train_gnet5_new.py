@@ -1,7 +1,5 @@
 """
-Created on Wed Feb 12 23:31:07 2020
-
-@author: Dannier Li (Chlerry)
+Created by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
 """
 # Disable INFO and WARNING messages from TensorFlow
 import os
@@ -16,7 +14,7 @@ from keras.callbacks import EarlyStopping
 from utility.parameter import *
 from utility.helper import psnr, load_imgs, regroup, image_to_block
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -28,7 +26,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
@@ -36,7 +34,7 @@ if rtx_optimizer == True:
 
 def model(images, decoded, b, bm, ratio):
     
-    # ============== DL ===============================
+    # =================================================
     prev = image_to_block(decoded[:-2], b, True)
 
     B = image_to_block(decoded[2:], b, True)
@@ -113,18 +111,18 @@ def model(images, decoded, b, bm, ratio):
 
     delta, n_patience, batch_size, epoch_size = get_training_parameter("prediction_gnet5")
 
-    # save model and load model:serialize model to JSON
+    # Save model and load model:serialize model to JSON
     model_json = pred_model.to_json()
     with open(json_path, "w") as json_file:
         json_file.write(model_json)
 
     
-    # define early stopping callback
+    # Define early stopping callback
     earlystop = EarlyStopping(monitor='val_loss', min_delta=delta, \
                               patience=n_patience, \
                               verbose=2, mode='min', \
                               baseline=None, restore_best_weights=True)                    
-    # define modelcheckpoint callback
+    # Define modelcheckpoint callback
     checkpointer = ModelCheckpoint(filepath=hdf5_path, \
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
@@ -133,8 +131,8 @@ def model(images, decoded, b, bm, ratio):
 
 def main(args = 1):  
     
-    b = 16 # blk_size
-    bm = 8 # target block size to predict
+    b = 16 
+    bm = 8 
 
     train_images = load_imgs(data_dir, train_start, train_end) 
 
