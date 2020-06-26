@@ -1,3 +1,8 @@
+"""
+Refactored and updated by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
+
+Initially created by Ying Liu on Wed Feb 12 23:31:07 2020
+"""
 # Disable INFO and WARNING messages from TensorFlow
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
@@ -11,7 +16,7 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping
 from utility.helper import psnr, load_imgs, image_to_block, add_noise
 from utility.parameter import *
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -25,17 +30,17 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def model(images, b, ratio, mode = 'default'):
+def model(images, b, ratio, mode = 'noise'):
 
     coarse_train_set = image_to_block(images, b)
     
-    # DL: Load stride and channel from utility.parameter.get_strides_channel
+    # Load stride and channel from utility.parameter.get_strides_channel
     channel, strides0 = get_channel_strides(ratio)
     
     input_coarse = Input(shape = (b, b, 3))
@@ -54,26 +59,26 @@ def model(images, b, ratio, mode = 'default'):
     coarse_model = Model(inputs = input_coarse, outputs = d)
     coarse_model.summary()
     
+    # Add mixed precition tool to optimizer
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
-    coarse_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError()) # RK
+    coarse_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError()) 
 
-    # ============== DL ===============================
+    # =================================================
     json_path, hdf5_path = get_model_path("coarse", ratio)
     delta, n_patience, batch_size, epoch_size = get_training_parameter("coarse")
     
-    # ============== YL ===============================
-    # save model and load model: serialize model to JSON
+    # Save model and load model: serialize model to JSON
     model_json = coarse_model.to_json()
     with open(json_path, "w") as json_file:
         json_file.write(model_json)
 
-    # define early stopping callback
+    # Define early stopping callback
     earlystop = EarlyStopping(monitor='val_loss', min_delta=delta, patience=n_patience, \
                               verbose=2, mode='min', \
                               baseline=None, restore_best_weights=True)                    
-    # define modelcheckpoint callback
+    # Define modelcheckpoint callback
     checkpointer = ModelCheckpoint(filepath = hdf5_path,\
                                    monitor = 'val_loss', save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
@@ -85,7 +90,7 @@ def main(args = 1):
 
     train_images = load_imgs(data_dir, train_start, train_end) 
     
-    model(train_images, b, training_ratio, 'noise')
+    model(train_images, b, training_ratio)
 
 if __name__ == "__main__":   
     import sys

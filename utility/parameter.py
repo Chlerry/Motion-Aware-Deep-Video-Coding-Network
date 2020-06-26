@@ -1,7 +1,10 @@
+"""
+Created by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
+"""
 # Set rtx_optimizer to turn on RTX 16bits float optimization
 rtx_optimizer = True
 
-# =========================================================================
+# ==================== Training & Testing Parameters =====================
 train_start, train_end = 0, 100
 n_train_frames = train_end - train_start
 

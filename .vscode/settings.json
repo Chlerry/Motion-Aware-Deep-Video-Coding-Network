@@ -1,8 +1,0 @@
-{
-    "files.exclude": {
-        "**/__pycache__": true,
-        "**/.ipynb_checkpoints": true,
-        "**/.spyproject":true,
-        "**/.vscode":true
-    }
-}
