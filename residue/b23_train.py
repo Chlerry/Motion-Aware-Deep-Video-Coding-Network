@@ -1,3 +1,6 @@
+"""
+Created by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
+"""
 # Disable INFO and WARNING messages from TensorFlow
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
@@ -14,7 +17,7 @@ import coarse.test
 from prediction.b1_inference import pred_inference_b1
 from prediction.b23_inference import pred_inference_b23
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -26,7 +29,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
@@ -35,19 +38,16 @@ if rtx_optimizer == True:
 from residue.b1_train import residue_train
     
 def main(args = 1): 
+    b = 16 
+    bm = 8 
     
-    folder = data_dir
-    
-    b = 16 # blk_size & ref. blk size
-    bm = 8 # target block size to predict
-    
-    train_images =  load_imgs(folder, train_start, train_end)
+    train_images =  load_imgs(data_dir, train_start, train_end)
     decoded = coarse.test.predict(train_images, b, training_ratio)
 
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
     from residue.b_inference import residue_inference
     final_predicted_b1 = residue_inference( \
-        train_images[2:-2], predicted_b1_frame, b, "residue_b1", training_ratio)
+        train_images[2:-2], predicted_b1_frame, b, training_ratio, "residue_b1")
 
     predicted_b2_frame = pred_inference_b23( \
         decoded[:-4], final_predicted_b1, b, bm, training_ratio)

@@ -1,3 +1,6 @@
+"""
+Created by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
+"""
 # Disable INFO and WARNING messages from TensorFlow
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
@@ -8,7 +11,7 @@ from utility.helper import psnr, load_imgs, regroup, save_imgs, performance_eval
 import coarse.test
 from prediction.b1_inference import pred_inference_b1
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -20,36 +23,33 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio, model = "prediction_b23"):
+def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio, model = "prediction"):
     
     N_frames = prev_decoded.shape[0]
-    # ============== DL ===============================
+    # =================================================
     prev = image_to_block(prev_decoded, b, True)
     
     B = image_to_block(predicted_b1_frame, b, True)
-    # print(B.shape)
-    # ============== DL ===============================
+    # =================================================
     json_path, hdf5_path = get_model_path(model, ratio)
-    
-    # ============== YL: load model ===============================
     
     from keras.models import model_from_json
     json_file = open(json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     pred_model = model_from_json(loaded_model_json)
-    # load weights into new model
+    # Load weights into new model
     pred_model.load_weights(hdf5_path)
     print("Loaded model from " + hdf5_path)
     
-    # ============== DL ===============================
-    # evaluate loaded model on test data
+    # =================================================
+    # Evaluate loaded model on test data
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
@@ -63,8 +63,8 @@ def pred_inference_b23(prev_decoded, predicted_b1_frame, b, bm, ratio, model = "
     
 def main(args = 1): 
     
-    b = 16 # blk_size & ref. blk size
-    bm = 8 # target block size to predict
+    b = 16 
+    bm = 8 
     
     test_images =  load_imgs(data_dir, test_start, test_end)
     decoded = coarse.test.predict(test_images, b, testing_ratio)
@@ -73,7 +73,7 @@ def main(args = 1):
     from residue.b_inference import residue_inference
     final_predicted_b1 = residue_inference(test_images[2:-2], predicted_b1_frame, b, "residue_b1", testing_ratio)
 
-    predicted_b2_frame = pred_inference_b23(decoded[:-4], final_predicted_b1, b, bm, testing_ratio, "prediction_b23")
+    predicted_b2_frame = pred_inference_b23(decoded[:-4], final_predicted_b1, b, bm, testing_ratio)
     print(decoded[:-4].shape)
     print(final_predicted_b1.shape)
     print(predicted_b2_frame.shape)

@@ -1,3 +1,6 @@
+"""
+Created by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
+"""
 # Disable INFO and WARNING messages from TensorFlow
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
@@ -15,7 +18,7 @@ from utility.parameter import *
 from prediction.b1_inference import pred_inference_b1
 from prediction.b23_inference import pred_inference_b23
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -27,24 +30,24 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def residue_inference(images, pred, b, model, ratio, mode = 'noise'): # start
+def residue_inference(images, pred, b, ratio, model, mode = 'noise'): 
 
-    # ============== DL ===============================
+    # =================================================
     json_path, hdf5_path = get_model_path(model, ratio)
     # =================================================
-    # load residue model
+    # Load residue model
     json_file = open(json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     residue_model = model_from_json(loaded_model_json, custom_objects={'tf': tf})
 
-    # load weights into new model
+    # Load weights into new model
     residue_model.load_weights(hdf5_path)
     print("Loaded model from " + hdf5_path)
     
@@ -66,12 +69,12 @@ def residue_inference(images, pred, b, model, ratio, mode = 'noise'): # start
     idx = 5 # index of desired layer
     layer_input = Input(shape=encoded.shape[1:]) # a new input tensor to be able to feed the desired layer
     
-    # create the new nodes for each layer in the path
+    # Create the new nodes for each layer in the path
     x = layer_input
     for layer in residue_model.layers[idx:]:
         x = layer(x)
      
-    # create the model
+    # Create the model
     decoder_model = Model(layer_input, x)
 
     residue_frames = decoder_model.predict(encoded)
@@ -85,29 +88,22 @@ def residue_inference(images, pred, b, model, ratio, mode = 'noise'): # start
     return finalpred
 ########################################################################
 def main(args = 1):       
-    b = 16 # blk_size & ref. blk size
-    bm = 8 # target block size to predict
+    b = 16 
+    bm = 8 
     
     test_images =  load_imgs(data_dir, test_start, test_end)
     decoded = coarse.test.predict(test_images, b, testing_ratio)
 
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, testing_ratio)
-    final_predicted_b1 = residue_inference(test_images[2:-2], predicted_b1_frame, b, "residue_b1", testing_ratio)
+    final_predicted_b1 = residue_inference(test_images[2:-2], predicted_b1_frame, b, testing_ratio, "residue_b1")
 
     predicted_b2_frame = pred_inference_b23(decoded[:-4], final_predicted_b1, b, bm, testing_ratio)
-    final_predicted_b2 = residue_inference(test_images[1:-3], predicted_b2_frame, b, "residue_b23", testing_ratio)
+    final_predicted_b2 = residue_inference(test_images[1:-3], predicted_b2_frame, b, testing_ratio, "residue_b23")
 
     predicted_b3_frame = pred_inference_b23(decoded[4:], final_predicted_b1, b, bm, testing_ratio)
-    final_predicted_b3 = residue_inference(test_images[3:-1], predicted_b3_frame, b, "residue_b23", testing_ratio)
+    final_predicted_b3 = residue_inference(test_images[3:-1], predicted_b3_frame, b, testing_ratio, "residue_b23")
 
 # #################################### EVALUATION #####################################
-#     n_predicted0, amse0, apsnr0, assim0 \
-#         = performance_evaluation(test_images, decoded, 0, 4)
-#     print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
-#     print('n_decoded:',n_predicted0)
-#     print('average test coarse_amse:',amse0)
-#     print('average test coarse_apsnr:',apsnr0)
-#     print('average test coarse_assim:',assim0)
 
     n_predicted1, amse1, apsnr1, assim1 \
         = performance_evaluation(test_images[2:-2], final_predicted_b1, 0, 4)
@@ -133,15 +129,15 @@ def main(args = 1):
     print('average test b3_apsnr:',apsnr3)
     print('average test b3_assim:',assim3)
 
-#     n_predicted = n_predicted0 + n_predicted1 + n_predicted2 + n_predicted3
-#     amse = (amse0*n_predicted0 + amse1*n_predicted1 + amse2*n_predicted2 + amse3*n_predicted3) / n_predicted
-#     apsnr = (apsnr0*n_predicted0 + apsnr1*n_predicted1 + apsnr2*n_predicted2 + apsnr3*n_predicted3) / n_predicted
-#     assim = (assim0*n_predicted0 + assim1*n_predicted1 + assim2*n_predicted2 + assim3*n_predicted3) / n_predicted
+    n_predicted = n_predicted0 + n_predicted1 + n_predicted2 + n_predicted3
+    amse = (amse0*n_predicted0 + amse1*n_predicted1 + amse2*n_predicted2 + amse3*n_predicted3) / n_predicted
+    apsnr = (apsnr0*n_predicted0 + apsnr1*n_predicted1 + apsnr2*n_predicted2 + apsnr3*n_predicted3) / n_predicted
+    assim = (assim0*n_predicted0 + assim1*n_predicted1 + assim2*n_predicted2 + assim3*n_predicted3) / n_predicted
 
-#     print("vvvvvvvvvvvv Overall vvvvvvvvvvvvv")
-#     print('average test final_amse:',amse)
-#     print('average test final_apsnr:',apsnr)
-#     print('average test final_assim:',assim)
+    print("vvvvvvvvvvvv Overall vvvvvvvvvvvvv")
+    print('average test final_amse:',amse)
+    print('average test final_apsnr:',apsnr)
+    print('average test final_assim:',assim)
     
 if __name__ == "__main__":   
     import sys

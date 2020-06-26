@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Wed Feb 12 23:31:07 2020
+Refactored and updated by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
 
-@author: yingliu
+Initially created by Ying Liu on Wed Feb 12 23:31:07 2020
 """
 # Disable INFO and WARNING messages from TensorFlow
 import os
@@ -21,7 +19,7 @@ from utility.helper import psnr, load_imgs, regroup, image_to_block, performance
 import coarse.test
 import prediction.inference
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -33,7 +31,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
@@ -43,16 +41,16 @@ def predict(residue, b, ratio, mode = 'default'): # start
 
     C = image_to_block(residue, b)
     
-    # ============== DL ===============================
+    # =================================================
     json_path, hdf5_path = get_model_path("residue", ratio)
     # =================================================
-    # load residue model
+    # Load residue model
     json_file = open(json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     residue_model = model_from_json(loaded_model_json, custom_objects={'tf': tf})
 
-    # load weights into new model
+    # Load weights into new model
     residue_model.load_weights(hdf5_path)
     print("Loaded model from " + hdf5_path)
 
@@ -64,28 +62,22 @@ def predict(residue, b, ratio, mode = 'default'): # start
     # ===================================================
     encoder_model = Model(inputs=residue_model.input,
                                           outputs=residue_model.get_layer('conv2d_3').output)
-    # encoder_model.summary()
 
     residue_set = image_to_block(residue, b)
     encoded = encoder_model.predict(residue_set) 
-    import seaborn as sns
-    # sns.distplot(encoded.flatten())
 
     encoded = np.rint(encoded)
-
-    # sns.distplot(encoded.flatten())
     # ===================================================
     idx = 5 # index of desired layer
     layer_input = Input(shape=encoded.shape[1:]) # a new input tensor to be able to feed the desired layer
     
-    # create the new nodes for each layer in the path
+    # Create the new nodes for each layer in the path
     x = layer_input
     for layer in residue_model.layers[idx:]:
         x = layer(x)
      
-    # create the model
+    # Create the model
     decoder_model = Model(layer_input, x)
-    # decoder_model.summary()
 
     residue_frames = decoder_model.predict(encoded)
     # ===================================================
@@ -95,8 +87,8 @@ def predict(residue, b, ratio, mode = 'default'): # start
     return final_prediction
   
 def main(args = 1):   
-    b = 16 # blk_size
-    bm = 8 # target block size to predict
+    b = 16 
+    bm = 8 
 
     test_images = load_imgs(data_dir, test_start, test_end)
 
