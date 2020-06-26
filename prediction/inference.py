@@ -1,7 +1,7 @@
 """
-Created on Wed Feb 12 23:31:07 2020
+Refactored and updated by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
 
-@author: yingliu
+Initially created by Ying Liu on Wed Feb 12 23:31:07 2020
 """
 # Disable INFO and WARNING messages from TensorFlow
 import os
@@ -16,7 +16,7 @@ from keras.callbacks import EarlyStopping
 from utility.parameter import *
 from utility.helper import psnr, load_imgs, image_to_block, performance_evaluation, regroup
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -28,7 +28,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
@@ -37,24 +37,23 @@ if rtx_optimizer == True:
 def predict(decoded, b, bm, ratio, model = "prediction"):
     
     N_frames = decoded.shape[0]
-    # ============== DL ===============================
+    # =================================================
     prev = image_to_block(decoded[:-2], b, True)
 
     B = image_to_block(decoded[2:], b, True)
-    # ============== DL ===============================
+    # =================================================
     json_path, hdf5_path = get_model_path(model, ratio)
-    # ============== YL: load model ===================
     
     from keras.models import model_from_json
     json_file = open(json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     pred_model = model_from_json(loaded_model_json)
-    # load weights into new model
+    # Load weights into new model
     pred_model.load_weights(hdf5_path)
     print("Loaded model from " + hdf5_path)
     
-    # evaluate loaded model on test data
+    # Evaluate loaded model on test data
     opt = tf.keras.optimizers.Adam()
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
@@ -68,8 +67,8 @@ def predict(decoded, b, bm, ratio, model = "prediction"):
     
 def main(args = 1):   
     
-    b = 16 # blk_size & ref. blk size
-    bm = 8 # target block size to predict
+    b = 16 
+    bm = 8 
     
     test_images = load_imgs(data_dir, test_start, test_end)
     import coarse.test

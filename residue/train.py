@@ -1,11 +1,7 @@
 """
-Created on Wed Feb 12 23:31:07 2020
+Refactored and updated by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
 
-@author: yingliu
-
-Revised on Tue June 16 2020
-
-@author: Dannier LI (Chlerry)
+Initially created by Ying Liu on Wed Feb 12 23:31:07 2020
 """
 # Disable INFO and WARNING messages from TensorFlow
 import os
@@ -21,7 +17,7 @@ from utility.parameter import *
 from utility.helper import psnr, load_imgs, regroup, image_to_block, add_noise
 import coarse.test, prediction.inference
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -33,17 +29,17 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
       
-def model(residue, b, ratio, mode = 'default'):
+def model(residue, b, ratio, mode = 'noise'):
     
     C = image_to_block(residue, b)
 
-    # DL: Load stride and channel from utility.parameter.get_strides_channel
+    # Load stride and channel from utility.parameter.get_strides_channel
     channel, strides0 = get_channel_strides(ratio)
 
     input1 = Input(shape = (b, b, 3))
@@ -68,21 +64,20 @@ def model(residue, b, ratio, mode = 'default'):
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
     residue_model.compile(optimizer=opt, loss='mse')
     
-    # ============== DL ===============================
+    # =================================================
     json_path, hdf5_path = get_model_path("residue", ratio)
     delta, n_patience, batch_size, epoch_size = get_training_parameter("residue")
 
-    # ============== YL ===============================
-    # save model
+    # Save model
     model_json = residue_model.to_json()
     with open(json_path, "w") as json_file:
         json_file.write(model_json)
     
-    # define early stopping callback
+    # Define early stopping callback
     earlystop = EarlyStopping(monitor='val_loss', min_delta=delta, patience=n_patience, \
                               verbose=2, mode='min', \
                               baseline=None, restore_best_weights=True)         
-    # define modelcheckpoint callback
+    # Define modelcheckpoint callback
     checkpointer = ModelCheckpoint(filepath=hdf5_path, \
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
@@ -90,8 +85,8 @@ def model(residue, b, ratio, mode = 'default'):
         verbose=2, validation_split=0.2, callbacks=callbacks_list)
     
 def main(args = 1): 
-    b = 16 # blk_size & ref. blk size
-    bm = 8 # target block size to predict
+    b = 16 
+    bm = 8 
 
     train_images = load_imgs(data_dir, train_start, train_end)
     decoded = coarse.test.predict(train_images, b, training_ratio)
@@ -100,7 +95,7 @@ def main(args = 1):
     
     residue_train_images = train_images[1:n_train_frames-1]
     residue = residue_train_images - regrouped_prediction
-    model(residue, b, training_ratio, 'noise')
+    model(residue, b, training_ratio)
     
 if __name__ == "__main__":   
     import sys

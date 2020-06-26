@@ -1,3 +1,6 @@
+"""
+Created by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
+"""
 # Disable INFO and WARNING messages from TensorFlow
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
@@ -13,7 +16,7 @@ import coarse.test
 from utility.parameter import *
 from prediction.b1_inference import pred_inference_b1
 
-# ============== DL ===============================
+# =================================================
 # Limit GPU memory(VRAM) usage in TensorFlow 2.0
 # https://github.com/tensorflow/tensorflow/issues/34355
 # https://medium.com/@starriet87/tensorflow-2-0-wanna-limit-gpu-memory-10ad474e2528
@@ -25,7 +28,7 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-# ============== DL ===============================
+# =================================================
 import keras.backend as K
 if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
@@ -58,22 +61,22 @@ def residue_train(residue, b, ratio, model = "residue_b1", mode = 'noise'):
     if rtx_optimizer == True:
         opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
     residue_model.compile(optimizer=opt, loss=keras.losses.MeanAbsoluteError())
-    # ============== DL ===============================
+    # =================================================
     json_path, hdf5_path = get_model_path(model, ratio)
     delta, n_patience, batch_size, epoch_size = get_training_parameter(model)
 
-    # ============== YL ===============================
-    # save model
+    # =================================================
+    # Save model
     model_json = residue_model.to_json()
     with open(json_path, "w") as json_file:
         json_file.write(model_json)
 
-    # define early stopping callback
+    # Define early stopping callback
     earlystop = EarlyStopping(monitor='val_loss', min_delta=delta, \
                               patience=n_patience, \
                               verbose=2, mode='auto', \
                               baseline=None, restore_best_weights=True)                    
-    # define modelcheckpoint callback
+    # Define modelcheckpoint callback
     checkpointer = ModelCheckpoint(filepath=hdf5_path,\
                                    monitor='val_loss',save_best_only=True)
     callbacks_list = [earlystop, checkpointer]
@@ -81,15 +84,15 @@ def residue_train(residue, b, ratio, model = "residue_b1", mode = 'noise'):
         verbose=2, validation_split=0.2, callbacks=callbacks_list)
     
 def main(args = 1): 
-    b = 16 # blk_size & ref. blk size
-    bm = 8 # target block size to predict
+    b = 16 
+    bm = 8 
     
     train_images = load_imgs(data_dir, train_start, train_end)
     decoded = coarse.test.predict(train_images, b, training_ratio)
 
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
 
-    residue = train_images[2:n_train_frames - 2] - predicted_b1_frame
+    residue = train_images[2:-2] - predicted_b1_frame
 
     residue_train(residue, b, training_ratio, "residue_b1")
     

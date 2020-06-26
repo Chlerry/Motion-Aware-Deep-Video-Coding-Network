@@ -1,3 +1,6 @@
+"""
+Created by Dannier Li (Chlerry) between Mar 30 and June 25 in 2020 
+"""
 import cv2
 import math
 import numpy as np
@@ -7,13 +10,24 @@ from skimage.metrics import structural_similarity as ssim
 from sklearn.metrics import mean_squared_error
 from skimage.util import view_as_blocks, view_as_windows
 
-def psnr(img_true, img_recovered):    
+def psnr(images, finalpred):    
+    """
+    Evaluate the PSNR of a predicted image
+    :param images: a numpy array of a ground truth image with shape (hight, width, n_channel=3)
+    :param finalpred: a numpy array of a final predicted truth image with shape (hight, width, n_channel=3)
+    :paran: the PSNR of a predicted image
+    """
     pixel_max = 255.0
-    mse = np.mean((img_true-img_recovered)**2)
+    mse = np.mean((images-finalpred)**2)
     p = 20 * math.log10( pixel_max / math.sqrt( mse ))
     return p
 
 def add_noise(e):
+    """
+    Add a noise layer between encoder and decoder
+    param e: a tensor layer 
+    return: a tensor layer added with uniform noise
+    """
     shape = tuple(e.get_shape().as_list()[1:])
     noise = np.random.uniform(-0.5, 0.5, shape)
     noise_tensor = tf.constant(noise, e.dtype)
@@ -21,6 +35,18 @@ def add_noise(e):
     return e
 
 def performance_evaluation(images, finalpred, start, step):
+    """
+    Evaluate predicted images by MSE, PSNR, and SSIM
+    :param images: a numpy array of float32 ground truth images with shape (n_image, hight, width, n_channel=3)
+    :param finalpred: a numpy array of float32 final predicted truth images with shape (n_image, hight, width, n_channel=3)
+    :param start: the startig index for evalutation. Must between [0, n_image - step)
+    :param step: the number of images skipped in each iteration
+    :return
+        n_evaluated: the number of images being evaluated
+        amse: average MSE
+        psnr: average PSNR
+        assim: average SSIM
+    """
     finalpred = finalpred.astype('uint8')
 
     N_frames = images.shape[0]
@@ -47,6 +73,13 @@ def performance_evaluation(images, finalpred, start, step):
     return n_evaluated, amse, apsnr, assim
 
 def load_imgs(path, start, end):
+    """
+    Load PNG images from path
+    :param path: path where images are loaded from
+    :param start: the starting index of image to be loaded
+    :param end: the ending index of image to be loaded
+    :return: a numpy array of float32 images with shape (n_image, hight, width, n_channel=3)
+    """
     train_set = []
     for n in range(start, end):
         fname = path +  str(n) + ".png"
@@ -58,6 +91,12 @@ def load_imgs(path, start, end):
 
 # Save final frames
 def save_imgs(save_dir, start, finalpred):
+    """
+    Save image as PNG format
+    :param save_dir: the saving directry
+    :param start: the starting index of image to be saved
+    :finalpred: numpy array of float32 final predicted truth images with shape (n_image, hight, width, n_channel=3)
+    """
     j = start
     for result in finalpred:
         filename = save_dir + str(j) + '.png'
@@ -66,12 +105,18 @@ def save_imgs(save_dir, start, finalpred):
         im.save(filename)
         j = j + 1
 
-def image_padding(image, pad_size, mode='constant', constant_values=0):
-        npad = ((pad_size, pad_size), (pad_size, pad_size), (0, 0))
-        if mode == 'constant':
-            return np.pad(image, npad, mode, constant_values=constant_values)
-        else:
-            return np.pad(image, npad, mode)
+def image_padding(images, pad_size, mode='constant', constant_values=0):
+    """
+    Pad image frames with zero padding
+    :param images: a numpy array of float32 images with shape (n_image, hight, width, n_channel=3)
+    :param pad_size: the number of padding pixels added to each edge. 
+    :return: padded images with shape (n_image, hight+2*pad_size, width+2*pad_size, n_channel=3) 
+    """
+    npad = ((pad_size, pad_size), (pad_size, pad_size), (0, 0))
+    if mode == 'constant':
+        return np.pad(images, npad, mode, constant_values=constant_values)
+    else:
+        return np.pad(images, npad, mode)
 
 def image_to_block(images, b_size=8, pad_en=False, bm_size = 8):
     """
@@ -79,7 +124,7 @@ def image_to_block(images, b_size=8, pad_en=False, bm_size = 8):
         Slicing image frames to patches 
     Block Mode (pad_en=True)
         Slicing image frames to blocks that each block centers at a patch
-    :param images: a numpy array of float32 images with shape (n_image, hight, weight, n_channel=3)
+    :param images: a numpy array of float32 images with shape (n_image, hight, width, n_channel=3)
     :param b_size: size of the output patch/block
     :param pad_en: padding switch
     :bm_size: centered patch size in Block Mode
@@ -98,7 +143,14 @@ def image_to_block(images, b_size=8, pad_en=False, bm_size = 8):
 
 # (n_blocks, b, b, 3) -> (n_frames, 480, 832, 3)
 def regroup(N_frames, images_shape, predicted_frames, b_size):
-    
+    """
+    Regroup patches/blocks to video frames
+    :param N_frames: the number of frames grouped into 
+    :param images_shape: a tuple of images shape (n_image, hight, width, n_channel=3)
+    :param predicted_frames: a numpy array of image blocks/patches with shape (n_patch, b_size, b_size, , n_channel=3)
+    :param b_size: size of the output patch/block
+    :return: a numpy array of regrouped images frames with shape: (n_image, hight, width, n_channel=3)
+    """
     width, height = images_shape[1], images_shape[2]
     
     final_prediction=[]
