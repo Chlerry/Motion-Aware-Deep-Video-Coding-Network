@@ -39,12 +39,12 @@ if __name__ == "__main__":
 #     # Train b2 and b3's residue net
 #     residue.b23_train.main()
 
-##################### New Method: test ####################
-    # Test b1's prediction net
-    prediction.b1_inference.main()
+# ##################### New Method: test ####################
+#     # Test b1's prediction net
+#     prediction.b1_inference.main()
     
-    # Test b2 and b3's prediction net
-    prediction.b23_inference.main()
+#     # Test b2 and b3's prediction net
+#     prediction.b23_inference.main()
     
-    # Test b1, b2 and b3's residue net
+#     # Test b1, b2 and b3's residue net
     residue.b_inference.main()

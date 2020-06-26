@@ -71,12 +71,9 @@ def main(args = 1):
 
     predicted_b1_frame = pred_inference_b1(decoded, b, bm, testing_ratio)
     from residue.b_inference import residue_inference
-    final_predicted_b1 = residue_inference(test_images[2:-2], predicted_b1_frame, b, "residue_b1", testing_ratio)
+    final_predicted_b1 = residue_inference(test_images[2:-2], predicted_b1_frame, b, testing_ratio, "residue_b1")
 
     predicted_b2_frame = pred_inference_b23(decoded[:-4], final_predicted_b1, b, bm, testing_ratio)
-    print(decoded[:-4].shape)
-    print(final_predicted_b1.shape)
-    print(predicted_b2_frame.shape)
 
     n_predicted2, amse2, apsnr2, assim2 \
         = performance_evaluation(test_images[1:-3], predicted_b2_frame, 0, 1)

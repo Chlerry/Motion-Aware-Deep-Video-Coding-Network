@@ -128,16 +128,6 @@ def main(args = 1):
     print('average test b3_amse:',amse3)
     print('average test b3_apsnr:',apsnr3)
     print('average test b3_assim:',assim3)
-
-    n_predicted = n_predicted0 + n_predicted1 + n_predicted2 + n_predicted3
-    amse = (amse0*n_predicted0 + amse1*n_predicted1 + amse2*n_predicted2 + amse3*n_predicted3) / n_predicted
-    apsnr = (apsnr0*n_predicted0 + apsnr1*n_predicted1 + apsnr2*n_predicted2 + apsnr3*n_predicted3) / n_predicted
-    assim = (assim0*n_predicted0 + assim1*n_predicted1 + assim2*n_predicted2 + assim3*n_predicted3) / n_predicted
-
-    print("vvvvvvvvvvvv Overall vvvvvvvvvvvvv")
-    print('average test final_amse:',amse)
-    print('average test final_apsnr:',apsnr)
-    print('average test final_assim:',assim)
     
 if __name__ == "__main__":   
     import sys
