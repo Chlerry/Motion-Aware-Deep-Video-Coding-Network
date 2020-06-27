@@ -41,12 +41,10 @@ def get_channel_strides(ratio):
     return switcher.get(ratio,"Invalid Ratio")
 
 # ============================== Model Paths ==============================
-# path example: C:\Users\danni\Documents\GitHub\SPIEcode-Daniel\models\BlowingBubbles_416x240_50\8\hdf5\
-# path format: C:\Users\danni\Documents\GitHub\SPIEcode-Daniel\models\BlowingBubbles_416x240_50\ + 8 + \hdf5\ + model + .hdf5
 def get_model_path(model, ratio):
 
-    json_path = model_dir + str(ratio) + "/json/" + model + ".json"
-    hdf5_path = model_dir + str(ratio) + "/hdf5/" + model + ".hdf5"
+    json_path = model_dir + str(ratio) + "/json/exp2_" + str(ratio) + "_" + model + ".json"
+    hdf5_path = model_dir + str(ratio) + "/hdf5/exp2_" + str(ratio) + "_" + model + ".hdf5"
 
     return json_path, hdf5_path
 
