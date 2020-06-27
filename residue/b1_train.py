@@ -90,7 +90,7 @@ def main(args = 1):
     train_images = load_imgs(data_dir, train_start, train_end)
     decoded = coarse.test.predict(train_images, b, training_ratio)
 
-    predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
+    predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio,"prediction_b1")
 
     residue = train_images[2:-2] - predicted_b1_frame
 

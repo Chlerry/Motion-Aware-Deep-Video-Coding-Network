@@ -94,7 +94,7 @@ def main(args = 1):
     test_images =  load_imgs(data_dir, test_start, test_end)
     decoded = coarse.test.predict(test_images, b, testing_ratio)
 
-    predicted_b1_frame = pred_inference_b1(decoded, b, bm, testing_ratio)
+    predicted_b1_frame = pred_inference_b1(decoded, b, bm, testing_ratio,"prediction_b1")
     final_predicted_b1 = residue_inference(test_images[2:-2], predicted_b1_frame, b, testing_ratio, "residue_b1")
 
     predicted_b2_frame = pred_inference_b23(decoded[:-4], final_predicted_b1, b, bm, testing_ratio)

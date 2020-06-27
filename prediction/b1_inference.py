@@ -65,9 +65,9 @@ def main(args = 1):
     bm = 8 
     
     test_images = load_imgs(data_dir, test_start, test_end)
-    decoded = coarse.test.predict(test_images, b, training_ratio)
+    decoded = coarse.test.predict(test_images, b, testing_ratio)
 
-    predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
+    predicted_b1_frame = pred_inference_b1(decoded, b, bm, testing_ratio,"prediction_b1")
     
     n_predicted1, amse1, apsnr1, assim1 \
         = performance_evaluation(test_images[2:n_test_frames-2], predicted_b1_frame, 0, 4)
