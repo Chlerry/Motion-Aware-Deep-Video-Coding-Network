@@ -6,7 +6,6 @@ import coarse.train, coarse.test
 import prediction.train, prediction.inference
 import prediction.b1_train, prediction.b1_inference
 import prediction.b23_train, prediction.b23_inference
-import prediction.train_gnet5_new
 
 import residue.train, residue.inference
 import residue.b1_train, residue.b23_train
@@ -34,8 +33,14 @@ if __name__ == "__main__":
     residue.inference.main()
     
 ##################### New Method: train ###################
+    # Train b1's prediction net
+    prediction.b1_train.main()
+
     # Train b1's residue net
     residue.b1_train.main()
+
+    # Train b23's prediction net
+    prediction.b23_train.main()
     
     # Train b2 and b3's residue net
     residue.b23_train.main()

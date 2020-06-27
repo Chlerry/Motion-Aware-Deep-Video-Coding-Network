@@ -35,7 +35,7 @@ if rtx_optimizer == True:
     K.set_epsilon(1e-4) 
 # =================================================
 
-def pred_train_b23(prev_decoded, predicted_b1_frame, images, b, bm, ratio):
+def pred_train_b23(prev_decoded, predicted_b1_frame, images, b, bm, ratio, model = "prediction_b23"):
     
     # =================================================
     prev = image_to_block(prev_decoded, b, True)
@@ -108,11 +108,11 @@ def main(args = 1):
     train_images = load_imgs(data_dir, train_start, train_end)
     decoded = coarse.test.predict(train_images, b, training_ratio)
 
-    predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio)
+    predicted_b1_frame = pred_inference_b1(decoded, b, bm, training_ratio,"prediction_b1")
 
-    final_predicted_b1 = residue_inference(train_images[2:-2], predicted_b1_frame, b, "residue_b1", training_ratio)
+    final_predicted_b1 = residue_inference(train_images[2:-2], predicted_b1_frame, b, training_ratio, "residue_b1")
 
-    pred_train_b23(decoded[:-4], final_predicted_b1, train_images[1:-3], b, bm, training_ratio)
+    pred_train_b23(decoded[:-4], final_predicted_b1, train_images[1:-3], b, bm, training_ratio,"prediction_b23")
 
 if __name__ == "__main__":   
     import sys
