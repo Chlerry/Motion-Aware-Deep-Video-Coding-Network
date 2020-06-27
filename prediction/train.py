@@ -105,8 +105,10 @@ def main(args = 1):
     bm = 8 # target block size to predict
 
     train_images = load_imgs(data_dir, train_start, train_end) 
+    import coarse.test
+    decoded = coarse.test.predict(train_images, b, training_ratio)
 
-    model(train_images, train_images, b, bm, training_ratio)
+    model(train_images, decoded, b, bm, training_ratio)
 
 if __name__ == "__main__":   
     import sys
